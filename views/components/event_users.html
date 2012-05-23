@@ -1,0 +1,15 @@
+{block_decorator name='box_cap' iconClass='ow_ic_user' langLabel='event+view_page_users_block_cap_label'}{/block_decorator}
+{block_decorator name='box' addClass="ow_std_margin clearfix"}
+{$userListMenu}
+<div id="userLists">
+    {foreach from=$userLists item='list' name='user_lists'}
+    <div id="{$list.contId}"{if !$smarty.foreach.user_lists.first}} style="display:none;"{/if}>
+         {$list.cmp}
+    </div>
+    <div style="display:none" id="{$list.contId}">
+    	{if $list.bottomLinkEnable}{decorator name='box_toolbar' itemList=$list.toolbarArray}{/if}
+    </div>
+	{/foreach}
+    {if $userLists[0].bottomLinkEnable}{decorator name='box_toolbar' itemList=$userLists[0].toolbarArray}{/if}
+</div>
+{/block_decorator}

@@ -1,0 +1,23 @@
+{if empty($noMenu)}
+{$listMenu}
+{/if}
+<div id="event_menu_my_cont" style="display: none;">
+{if empty($my_events)}
+<div class="ow_nocontent">{text key="event+no_events_label"}</div>
+{else}
+{foreach from=$my_events item='event'}
+    {decorator name='ipc' addClass='ow_smallmargin' data=$event infoString="<a href=\"`$event.eventUrl`\">`$event.title`</a>"}
+{/foreach}
+{if !empty($toolbars.my)}{decorator name='box_toolbar' itemList=$toolbars.my}{/if}
+{/if}
+</div>
+<div id="event_menu_part_cont">
+{if empty($part_events)}
+<div class="ow_nocontent">{text key="event+no_events_label"}</div>
+{else}
+{foreach from=$part_events item='event'}
+    {decorator name='ipc' addClass='ow_smallmargin' data=$event infoString="<a href=\"`$event.eventUrl`\">`$event.title`</a>"}
+{/foreach}
+{if !empty($toolbars.part)}{decorator name='box_toolbar' itemList=$toolbars.part}{/if}
+{/if}
+</div>

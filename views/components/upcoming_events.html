@@ -1,0 +1,8 @@
+{if empty($events)}
+<div class="ow_nocontent">{$no_content_message}</div>
+{else}
+{foreach from=$events item='event'}
+    {decorator name='ipc' addClass='ow_smallmargin' data=$event infoString="<a href=\"`$event.eventUrl`\">`$event.title`</a>"}
+{/foreach}
+{if !empty($toolbar)}{decorator name='box_toolbar' itemList=$toolbar}{/if}
+{/if}

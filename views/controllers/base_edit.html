@@ -1,0 +1,66 @@
+<div class="ow_superwide ow_automargin">
+
+    {if empty($err_msg)}
+		{form name='event_edit'}
+		<table class="ow_table_1 ow_form">
+            <tr class="ow_alt2">
+		        <td class="ow_label">{label name='title'}</td>
+                <td class="ow_value">{input name='title'}{error name='title'}</td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_title_desc'}</td>
+		    </tr>
+		    <tr class="ow_alt1">
+		        <td class="ow_label">{text key='event+add_form_date_label'}</td>
+                <td class="ow_value">
+                    <div class="clearfix">
+                        <div style="float:left;">{input name='start_date'}{error name='start_date'}</div>
+                        <div style="float: left;padding-left: 4px;">{input name='start_time'}<br />{error name='start_time'}</div>
+                    </div>
+                </td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_date_desc'}</td>
+		    </tr>
+            <tr class="ow_alt2" id="{$tdId}">
+		        <td class="ow_label">{text key='event+add_form_end_date_label'} <input type="checkbox" name="endDateFlag" id="{$chId}"{if !empty($endDateFlag)} checked="checked"{/if} /></td>
+		        <td class="ow_value">
+                    <div class="clearfix">
+                        <div style="float:left;">
+                            {input name='end_date'}{error name='end_date'}</div>
+                        <div style="float: left;padding-left: 4px;">{input name='end_time'}<br />{error name='end_time'}</div>
+                    </div>
+                </td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_end_date_desc'}</td>
+		    </tr>
+            <tr class="ow_alt1">
+		        <td class="ow_label">{label name='desc'}</td>
+		        <td class="ow_value">{input name='desc'} <br /> {error name='desc'}</td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_desc_desc'}</td>
+		    </tr>
+            <tr class="ow_alt2">
+		        <td class="ow_label">{label name='location'}</td>
+		        <td class="ow_value">{input name='location'} <br /> {error name='location'}</td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_location_desc'}</td>
+		    </tr>
+            <tr class="ow_alt1">
+		        <td class="ow_label">{label name='image'}</td>
+                <td class="ow_value">{if !empty($imgsrc)}<img src="{$imgsrc}" />&nbsp;&nbsp;{/if}{input name='image'} <br /> {error name='image'}</td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_image_desc'}</td>
+		    </tr>
+            <tr class="ow_alt2">
+		        <td class="ow_label">{label name='who_can_view'}</td>
+		        <td class="ow_value">{input name='who_can_view'} <br /> {error name='who_can_view'}</td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_who_can_view_desc'}</td>
+		    </tr>
+            <tr class="ow_alt1">
+		        <td class="ow_label">{label name='who_can_invite'}</td>
+		        <td class="ow_value">{input name='who_can_invite'} <br /> {error name='who_can_invite'}</td>
+		        <td class="ow_desc ow_small">{text key='event+add_form_who_can_invite_desc'}</td>
+		    </tr>
+		    <tr>
+		        <td colspan="3" class="ow_submit">{submit name='submit' class='ow_ic_edit'}</td>
+		    </tr>
+		</table>
+
+		{/form}
+    {else}
+        <div class="ow_anno ow_std_margin ow_nocontent">{$err_msg}</div>
+    {/if}
+</div>

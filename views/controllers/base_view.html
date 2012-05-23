@@ -1,0 +1,83 @@
+{if !empty($authErrorText)}
+    <div class="ow_anno ow_center">
+        {$authErrorText}
+    </div>
+{else}
+{style}
+{literal}
+.attend_buttons{
+text-align:right;
+margin-bottom:7px;
+}
+.attend_buttons input{
+
+}
+.current_status{
+	padding-bottom:4px;
+}
+
+.inviteLink{
+    text-align:center;    
+}
+{/literal}
+{/style}
+{if !empty($editArray)}
+<div class="ow_stdmargin ow_txtright">
+    <ul class="ow_bl clearfix ow_small ow_stdmargin">
+        <li><a href="{$editArray.delete.url}" class="ow_mild_red" onclick="return confirm('{$editArray.delete.confirmMessage}');">{$editArray.delete.label}</a></li>
+        <li><a href="{$editArray.edit.url}">{$editArray.edit.label}</a></li>
+    </ul>
+</div>
+{/if}
+<div class="clearfix" id="{$contId}">
+	{if empty($no_attend_form)}
+    <div class="attend_buttons">
+	    <div class="current_status"><span class="status">{if !empty($currentStatus)}{$currentStatus}{/if}</span> <span class="link"{if empty($currentStatus)} style="display:none;"{/if}>(<a href="javascript://">{text key='event+current_status_change_label'}</a>)</span></div>
+        <div class="buttons"{if !empty($currentStatus)} style="display:none;"{/if}>
+             {form name='event_attend'}
+                 {decorator name='button' class='ow_ic_ok' type='submit' langLabel='event+attend_yes_btn_label' id='event_attend_yes_btn'}
+                 {decorator name='button' class='ow_ic_flag' type='submit' langLabel='event+attend_maybe_btn_label' id='event_attend_maybe_btn'}
+                 {decorator name='button' class='ow_ic_warning' type='submit' langLabel='event+attend_no_btn_label' id='event_attend_no_btn'}
+             {/form}
+    </div>
+</div>
+{/if}
+<div class="ow_left ow_supernarrow">
+    {block_decorator name='box_cap' iconClass='ow_ic_info' langLabel='event+view_page_details_block_cap_label'}{/block_decorator}
+    {block_decorator name='box' addClass='ow_std_margin'}
+    <table class="ow_table_3">
+        <tr>
+            <td class="ow_label" style="width: 25%">{text key='event+view_page_date_label'}</td>
+            <td class="ow_value">{$info.date}</td>
+        </tr>
+        {if !empty($info.endDate)}
+        <tr>
+            <td class="ow_label" style="width: 25%">{text key='event+view_page_end_date_label'}</td>
+            <td class="ow_value">{$info.endDate}</td>
+        </tr>
+        {/if}
+        <tr>
+            <td class="ow_label" style="width: 25%">{text key='event+view_page_location_label'}</td>
+            <td class="ow_value"><div style="width:90px;">{$info.location}</div></td>
+        </tr>
+        <tr>
+            <td class="ow_label" style="width: 25%">{text key='event+view_page_created_label'}</td>
+            <td class="ow_value"><a href="{$info.creatorLink}">{$info.creatorName}</td>
+        </tr>
+    </table>
+    {/block_decorator}
+    {if !empty($inviteLink)}<div class="inviteLink ow_std_margin">{decorator name='button' class='ow_ic_add' type='button' langLabel='event+invite_btn_label' id='inviteLink'}</div>{/if}
+    <div class="userList">{$userListCmp}</div>
+</div>
+<div class="ow_right ow_superwide">
+
+    {block_decorator name='box_cap' type='empty' iconClass='ow_ic_picture' langLabel='event+view_page_image_block_cap_label'}{/block_decorator}
+    {block_decorator name='box' type='empty' addClass="ow_std_margin clearfix"}
+    {if !empty($info.image)}<img src="{$info.image}" alt="" style="float: right;margin: 5px;" />{/if}{$info.desc}
+    {/block_decorator}
+
+    
+    {$comments}
+</div>
+</div>
+{/if}

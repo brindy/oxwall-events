@@ -1,0 +1,19 @@
+{style}
+{literal}
+{/literal}
+{/style}
+{if empty($noButton)}<div class="ow_right">{decorator name='button' onclick="window.location='$add_new_url'" class='ow_ic_add' langLabel='event+add_new_button_label'}</div>{/if}
+{if !empty($contentMenu)}{$contentMenu}{/if}
+<div class="clearfix">
+    <div class="ow_automargin ow_superwide">
+      {if !empty($no_events) }
+        <div class="ow_nocontent">{text key="event+no_events_label"}</div>
+      {else}
+          {foreach from=$events key='key' item='event'}
+                {decorator name='ipc' addClass='ow_smallmargin' data=$event infoString="<a href=\"`$event.eventUrl`\">`$event.title`</a>"}
+          {/foreach}
+          <br />
+          {$paging}
+      {/if}
+    </div>
+</div>
