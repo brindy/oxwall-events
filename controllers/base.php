@@ -189,6 +189,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setEndDateFlag( !empty($_POST['endDateFlag']) );
                     $event->setStartTimeDisable( $data['start_time'] == 'all_day' );
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
+		    $event->setAttendeeLimit( $data['limit'] );
 
                     if ( $imagePosted )
                     {
@@ -286,7 +287,7 @@ class EVENT_CTRL_Base extends OW_ActionController
         $form->getElement('location')->setValue($event->getLocation());
         $form->getElement('who_can_view')->setValue($event->getWhoCanView());
         $form->getElement('who_can_invite')->setValue($event->getWhoCanInvite());
-        $form->getElement('who_can_invite')->setValue($event->getWhoCanInvite());
+        $form->getElement('limit')->setValue($event->getAttendeeLimit());
 
         $startTimeArray = array('hour' => date('G', $event->getStartTimeStamp()), 'minute' => date('i', $event->getStartTimeStamp()));
         $form->getElement('start_time')->setValue($startTimeArray);
@@ -417,6 +418,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setEndDateFlag(!empty($_POST['endDateFlag']));
                     $event->setStartTimeDisable( $data['start_time'] == 'all_day' );
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
+		    $event->setAttendeeLimit( $data['limit'] );
 
                     $this->eventService->saveEvent($event);
 
@@ -533,7 +535,8 @@ class EVENT_CTRL_Base extends OW_ActionController
             'desc' => UTIL_HtmlTag::autoLink($event->getDescription()),
             'title' => $event->getTitle(),
             'creatorName' => BOL_UserService::getInstance()->getDisplayName($event->getUserId()),
-            'creatorLink' => BOL_UserService::getInstance()->getUserUrl($event->getUserId())
+            'creatorLink' => BOL_UserService::getInstance()->getUserUrl($event->getUserId()),
+	    'limit' => $event->getAttendeeLimit()
         );
 
         $this->assign('info', $infoArray);

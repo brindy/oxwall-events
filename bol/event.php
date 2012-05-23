@@ -94,7 +94,21 @@ class EVENT_BOL_Event extends OW_Entity
      * @var boolean
      */
     public $endTimeDisabled = false;
+    /**
+     * @var integer
+     */
+    public $attendeeLimit = -1;
 
+    public function getAttendeeLimit() 
+    {
+	return $this->attendeeLimit;
+    }
+   
+    public function setAttendeeLimit( $attendeeLimit ) 
+    {
+	$this->attendeeLimit = $attendeeLimit;
+    }
+    
     public function getTitle()
     {
         return $this->title;
