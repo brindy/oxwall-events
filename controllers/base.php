@@ -541,6 +541,16 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         $this->assign('info', $infoArray);
 
+	$attendeeCount = $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES );
+	$attendeeLimit = $event->getAttendeeLimit();
+	if ( isset( $attendeeLimit )  && $attendeeCount >= $event->getAttendeeLimit() )
+        {
+       	    $this->assign('event_full', true);
+	    $eventFull = true;
+        }
+
+	// TODO only show attend form if the event is not full OR the user has already replied YES
+
         // event attend form
         if ( OW::getUser()->isAuthenticated() && $event->getEndTimeStamp() > time() )
         {
@@ -548,34 +558,44 @@ class EVENT_CTRL_Base extends OW_ActionController
             {
                 $this->assign('currentStatus', OW::getLanguage()->text('event', 'user_status_label_' . $eventUser->getStatus()));
             }
-            $this->addForm(new AttendForm($event->getId(), $cmpId));
+            
+	    if ( $eventUser !== null || !isset( $attendeeLimit ) || $attendeeCount < $attendeeLimit ) 
+    	    {
+
+	    $this->addForm(new AttendForm($event->getId(), $cmpId));
 
             $onloadJs = "
-                var \$context = $('#" . $cmpId . "');
-                $('#event_attend_yes_btn').click(
-                    function(){
-                        $('input[name=attend_status]', \$context).val(" . EVENT_BOL_EventService::USER_STATUS_YES . ");
-                    }
-                );
-                $('#event_attend_maybe_btn').click(
-                    function(){
-                        $('input[name=attend_status]', \$context).val(" . EVENT_BOL_EventService::USER_STATUS_MAYBE . ");
-                    }
-                );
-                $('#event_attend_no_btn').click(
-                    function(){
-                        $('input[name=attend_status]', \$context).val(" . EVENT_BOL_EventService::USER_STATUS_NO . ");
-                    }
-                );
+                    var \$context = $('#" . $cmpId . "');
+                    $('#event_attend_yes_btn').click(
+                        function(){
+                            $('input[name=attend_status]', \$context).val(" . EVENT_BOL_EventService::USER_STATUS_YES . ");
+                        }
+                    );
+                    $('#event_attend_maybe_btn').click(
+                        function(){
+                            $('input[name=attend_status]', \$context).val(" . EVENT_BOL_EventService::USER_STATUS_MAYBE . ");
+                        }
+                    );
+                    $('#event_attend_no_btn').click(
+                        function(){
+                            $('input[name=attend_status]', \$context).val(" . EVENT_BOL_EventService::USER_STATUS_NO . ");
+                        }
+                    );
 
-                $('.current_status a', \$context).click(
-                    function(){
-                        $('.attend_buttons .buttons', \$context).fadeIn(500);
-                    }
-                );
-            ";
+                    $('.current_status a', \$context).click(
+                        function(){
+                            $('.attend_buttons .buttons', \$context).fadeIn(500);
+                    	}
+                    );
+	    ";
 
             OW::getDocument()->addOnloadScript($onloadJs);
+
+            }
+	    else
+	    {
+		$this->assign('no_attend_form', true);
+            }
         }
         else
         {

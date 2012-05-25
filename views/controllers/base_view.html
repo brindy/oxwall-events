@@ -41,6 +41,14 @@ margin-bottom:7px;
              {/form}
     </div>
 </div>
+{elseif !empty($event_full)}
+
+	<div class="attend_buttons">
+    <div class="current_status">
+    	<span class="status">{text key='event+full_status'}</span>
+    </div>
+	</div>
+
 {/if}
 <div class="ow_left ow_supernarrow">
     {block_decorator name='box_cap' iconClass='ow_ic_info' langLabel='event+view_page_details_block_cap_label'}{/block_decorator}
@@ -67,7 +75,11 @@ margin-bottom:7px;
 	{if !empty($info.limit)}
 	<tr>
 	    <td class="ow_label" style="width: 25%">{text key='event+view_page_limit'}</td>
-	    <td class="ow_value">{$info.limit}</td>
+	    <td class="ow_value">{$info.limit}
+		{if !empty($event_full)}
+		    {text key='event+full'}
+		{/if}
+            </td>
 	</tr>
 	{/if}
     </table>
