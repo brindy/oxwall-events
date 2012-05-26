@@ -33,6 +33,7 @@ $errors = array();
 
 try
 {
+    Updater::getLanguageService()->importPrefixFromZip(dirname(__FILE__) . DS . 'langs.zip', 'event');
     Updater::getDbo()->query("ALTER TABLE `" . OW_DB_PREFIX . "event_item` ADD `attendeeLimit` INT(11)");
 }
 catch( Exception $e )
