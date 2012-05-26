@@ -1421,7 +1421,7 @@ class EventAddForm extends Form
         $this->addElement($imageField);
 
 	$limitField = new TextField('limit');
-	$limitField->addValidator(new IntValidator());
+	$limitField->addValidator(new IntValidator( 1 ));
 	$limitField->setLabel($language->text('event', 'limit'));
 	$this->addElement($limitField);
 
