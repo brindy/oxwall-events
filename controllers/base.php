@@ -1126,6 +1126,17 @@ class EVENT_CTRL_Base extends OW_ActionController
 //                exit(json_encode($respondArray));
 //            }
 
+            $attendeeCount = $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES );
+            $attendeeLimit = $event->getAttendeeLimit();
+            if ( isset( $attendeeLimit )  && $attendeeCount >= $event->getAttendeeLimit() )
+	    {
+		if ( (int) $_POST['attend_status'] == EVENT_BOL_EventService::USER_STATUS_YES ) 
+		{
+		    $respondArray['message'] = OW::getLanguage()->text('event', 'user_status_event_full_error');
+		    exit(json_encode($respondArray));
+		}
+	    }
+        
             if ( $eventUser === null )
             {
                 $eventUser = new EVENT_BOL_EventUser();
