@@ -76,9 +76,11 @@ margin-bottom:7px;
 	<tr>
 	    <td class="ow_label" style="width: 25%">{text key='event+view_page_limit'}</td>
 	    <td class="ow_value">{$info.limit}
+		<span class="attendence_cap">
 		{if !empty($event_full)}
 		    {text key='event+full'}
 		{/if}
+		</span>
             </td>
 	</tr>
 	{/if}

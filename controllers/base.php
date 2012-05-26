@@ -1119,11 +1119,12 @@ class EVENT_CTRL_Base extends OW_ActionController
                 exit(json_encode($respondArray));
             }
 
-            if ( $event->getUserId() == OW::getUser()->getId() && (int) $_POST['attend_status'] == EVENT_BOL_EventService::USER_STATUS_NO )
-            {
-                $respondArray['message'] = OW::getLanguage()->text('event', 'user_status_author_cant_leave_error');
-                exit(json_encode($respondArray));
-            }
+//		author *can* leave the event, for instance if setting up for someone else
+//            if ( $event->getUserId() == OW::getUser()->getId() && (int) $_POST['attend_status'] == EVENT_BOL_EventService::USER_STATUS_NO )
+//            {
+//                $respondArray['message'] = OW::getLanguage()->text('event', 'user_status_author_cant_leave_error');
+//                exit(json_encode($respondArray));
+//            }
 
             if ( $eventUser === null )
             {
@@ -1135,6 +1136,17 @@ class EVENT_CTRL_Base extends OW_ActionController
             $eventUser->setStatus((int) $_POST['attend_status']);
             $eventUser->setTimeStamp(time());
             $this->eventService->saveEventUser($eventUser);
+
+	    $attendeeCount = $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES );
+            $attendeeLimit = $event->getAttendeeLimit();
+            if ( isset( $attendeeLimit )  && $attendeeCount >= $event->getAttendeeLimit() )
+            {
+		$respondArray['attendence_cap'] = OW::getLanguage()->text('event', 'full');
+	    } 
+	    else
+	    {
+	        $respondArray['attendence_cap'] = '';
+            }
 
             $this->eventService->deleteUserEventInvites((int)$_POST['eventId'], OW::getUser()->getId());
             
@@ -1294,6 +1306,7 @@ class AttendForm extends Form
                 OW.error(data.message);
             }
             else{
+		$('.attendence_cap', \$context).html(data.attendence_cap);
                 $('.current_status span.status', \$context).empty().html(data.currentLabel);
                 $('.current_status span.link', \$context).css({display:'inline'});
                 $('.attend_buttons .buttons', \$context).fadeOut(500);
