@@ -72,10 +72,10 @@ margin-bottom:7px;
             <td class="ow_label" style="width: 25%">{text key='event+view_page_created_label'}</td>
             <td class="ow_value"><a href="{$info.creatorLink}">{$info.creatorName}</td>
         </tr>
-	{if !empty($info.limit)}
+	{if !empty($info.attendeeLimit)}
 	<tr>
 	    <td class="ow_label" style="width: 25%">{text key='event+view_page_limit'}</td>
-	    <td class="ow_value">{$info.limit}
+	    <td class="ow_value">{$info.attendeeCount} / {$info.attendeeLimit}
 		<span class="attendence_cap">
 		{if !empty($event_full)}
 		    {text key='event+full'}

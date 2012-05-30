@@ -536,14 +536,13 @@ class EVENT_CTRL_Base extends OW_ActionController
             'title' => $event->getTitle(),
             'creatorName' => BOL_UserService::getInstance()->getDisplayName($event->getUserId()),
             'creatorLink' => BOL_UserService::getInstance()->getUserUrl($event->getUserId()),
-	    'limit' => $event->getAttendeeLimit()
+	    'attendeeLimit' => $event->getAttendeeLimit(),
+            'attendeeCount' => $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES ) 
         );
 
         $this->assign('info', $infoArray);
 
-	$attendeeCount = $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES );
-	$attendeeLimit = $event->getAttendeeLimit();
-	if ( isset( $attendeeLimit )  && $attendeeCount >= $event->getAttendeeLimit() )
+	if ( isset( $nfoArray['attendeeLimit'] )  && $infoArray['attendeeCount'] >= $infoArray['attendeeLimit'] )
         {
        	    $this->assign('event_full', true);
 	    $eventFull = true;
