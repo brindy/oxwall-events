@@ -47,6 +47,26 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->eventService = EVENT_BOL_EventService::getInstance();
     }
 
+	/**
+	 *
+	 */
+	public function cloneEvent( $params ) 
+	{
+        $event = $this->getEventForParams($params);
+		$event->setId(null);
+		
+		$this->eventService->saveEvent($event);
+
+        $eventUser = new EVENT_BOL_EventUser();
+        $eventUser->setEventId($event->getId());
+        $eventUser->setUserId(OW::getUser()->getId());
+        $eventUser->setTimeStamp(time());
+        $eventUser->setStatus(EVENT_BOL_EventService::USER_STATUS_YES);
+        $this->eventService->saveEventUser($eventUser);
+		
+        $this->redirect(OW::getRouter()->urlForRoute('event.edit', array('eventId' => $event->getId())));
+	}
+
     /**
      * Add new event controller
      */
@@ -189,7 +209,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setEndDateFlag( !empty($_POST['endDateFlag']) );
                     $event->setStartTimeDisable( $data['start_time'] == 'all_day' );
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
-		    $event->setAttendeeLimit( $data['limit'] );
+		    		$event->setAttendeeLimit( $data['limit'] );
 
                     if ( $imagePosted )
                     {
@@ -358,24 +378,24 @@ class EVENT_CTRL_Base extends OW_ActionController
 
                 if ( !empty($_POST['endDateFlag']) && !empty($data['end_date']) )
                 {
+					$dateArray = explode('/', $data['end_date']);
+                    $endStamp = mktime(0, 0, 0, $dateArray[1], $dateArray[2], $dateArray[0]);
+                    $endStamp = strtotime("+1 day", $endStamp);
+
+					if ( $data['end_time'] != 'all_day' )
+                    {
+						$hour = 0;
+						$min = 0;
+
+						if( $data['end_time'] != 'all_day' )
+						{
+							$hour = $data['end_time']['hour'];
+							$min = $data['end_time']['minute'];
+						}
+
                         $dateArray = explode('/', $data['end_date']);
-                        $endStamp = mktime(0, 0, 0, $dateArray[1], $dateArray[2], $dateArray[0]);
-                        $endStamp = strtotime("+1 day", $endStamp);
-
-                        if ( $data['end_time'] != 'all_day' )
-                        {
-                            $hour = 0;
-                            $min = 0;
-
-                            if( $data['end_time'] != 'all_day' )
-                            {
-                                $hour = $data['end_time']['hour'];
-                                $min = $data['end_time']['minute'];
-                            }
-
-                            $dateArray = explode('/', $data['end_date']);
-                            $endStamp = mktime($hour, $min, 0, $dateArray[1], $dateArray[2], $dateArray[0]);
-                        }
+						$endStamp = mktime($hour, $min, 0, $dateArray[1], $dateArray[2], $dateArray[0]);
+					}
                 }
 
                 $event->setStartTimeStamp($startStamp);
@@ -418,10 +438,9 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setEndDateFlag(!empty($_POST['endDateFlag']));
                     $event->setStartTimeDisable( $data['start_time'] == 'all_day' );
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
-		    $event->setAttendeeLimit( $data['limit'] );
+		    		$event->setAttendeeLimit( $data['limit'] );
 
                     $this->eventService->saveEvent($event);
-
                     
                     $e = new OW_Event(EVENT_BOL_EventService::EVENT_AFTER_EVENT_EDIT, array('eventId' => $event->id));
                     OW::getEventManager()->trigger($e);
@@ -508,17 +527,30 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         if ( OW::getUser()->isAuthorized('event') || OW::getUser()->getId() == $event->getUserId() )
         {
-            $this->assign('editArray', array(
-                'edit' => array('url' => OW::getRouter()->urlForRoute('event.edit', array('eventId' => $event->getId())), 'label' => OW::getLanguage()->text('event', 'edit_button_label')),
-                'delete' =>
-                array(
+             $editArray = array(
+                'edit' => array(
+					'url' => OW::getRouter()->urlForRoute('event.edit', array('eventId' => $event->getId())), 
+					'label' => OW::getLanguage()->text('event', 'edit_button_label')
+				),
+                'delete' => array(
                     'url' => OW::getRouter()->urlForRoute('event.delete', array('eventId' => $event->getId())),
                     'label' => OW::getLanguage()->text('event', 'delete_button_label'),
                     'confirmMessage' => OW::getLanguage()->text('event', 'delete_confirm_message')
                 ),
-                )
-            );
+				'clone' => array(
+					'url' => OW::getRouter()->urlForRoute('event.clone', array('eventId' => $event->getId())), 
+					'label' => OW::getLanguage()->text('event', 'clone_button_label'),
+					'confirmMessage' => OW::getLanguage()->text('event', 'clone_confirm_message')
+				),
+			);
         }
+
+	if ( is_array( $editArray )) 
+	{
+
+	    $this->assign('editArray', $editArray);
+
+	}
         
         OW::getNavigation()->activateMenuItem(OW_Navigation::MAIN, 'event', 'main_menu_item');
         $this->setPageHeading($event->getTitle());
@@ -542,10 +574,10 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         $this->assign('info', $infoArray);
 
-	if ( isset( $nfoArray['attendeeLimit'] )  && $infoArray['attendeeCount'] >= $infoArray['attendeeLimit'] )
+		if ( isset( $nfoArray['attendeeLimit'] )  && $infoArray['attendeeCount'] >= $infoArray['attendeeLimit'] )
         {
        	    $this->assign('event_full', true);
-	    $eventFull = true;
+	    	$eventFull = true;
         }
 
 	// TODO only show attend form if the event is not full OR the user has already replied YES

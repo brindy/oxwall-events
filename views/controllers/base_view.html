@@ -26,6 +26,7 @@ margin-bottom:7px;
     <ul class="ow_bl clearfix ow_small ow_stdmargin">
         <li><a href="{$editArray.delete.url}" class="ow_mild_red" onclick="return confirm('{$editArray.delete.confirmMessage}');">{$editArray.delete.label}</a></li>
         <li><a href="{$editArray.edit.url}">{$editArray.edit.label}</a></li>
+	<li><a href="{$editArray.clone.url}" onclick="return confirm('{$editArray.clone.confirmMessage}');">{$editArray.clone.label}</a></li>
     </ul>
 </div>
 {/if}
