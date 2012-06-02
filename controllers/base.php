@@ -47,15 +47,60 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->eventService = EVENT_BOL_EventService::getInstance();
     }
 
-	/**
-	 *
-	 */
-	public function cloneEvent( $params ) 
-	{
+    public function calendarView() 
+    {
+        $configs = $this->eventService->getConfigs();
+
+        $language = OW::getLanguage();
+
+   		$contentMenu = $this->getContentMenu();
+        $contentMenu->getElement('calendar')->setActive(true);
+        $this->addComponent('contentMenu', $contentMenu);
+        $this->setPageHeading($language->text('event', 'calendar_events_page_heading'));
+        $this->setPageTitle($language->text('event', 'calendar_events_page_title'));
+        $this->setPageHeadingIconClass('ow_ic_calendar');
+        OW::getDocument()->setDescription($language->text('event', 'calendar_events_page_desc'));
+  		// $thisMonthEvents = $this->eventService->findPublicEventsForCurrentMonth();
+  		// $nextMonthEvents = $this->eventService->findPublicEventsForCurrentMonth(+1);
+
+        if ( !OW::getUser()->isAuthorized('event', 'add_event') )
+        {
+            $this->assign('noButton', true);
+        }
+
+//        $this->assign('thisMonthEvents', $thisMonthEvents);
+//        $this->assign('nextMonthEvents', $nextMonthEvents);
+        $this->assign('add_new_url', OW::getRouter()->urlForRoute('event.add'));
+        OW::getNavigation()->activateMenuItem(OW_Navigation::MAIN, 'event', 'main_menu_item');
+    }
+
+    public function cloneEvent( $params ) 
+    {
+        $language = OW::getLanguage();
         $event = $this->getEventForParams($params);
 		$event->setId(null);
+		$this->eventService->saveEvent( $event );
+
+		// TODO test this!
+		if ( $event->getImage() ) 
+		{
+			$imagePath = $this->eventService->generateImagePath( $event->getImage(), false );
+			$event->setImage( uniqid() );
+
+			$pathInfo = pathinfo( $imagePath );
+			$ext = $pathInfo['extension'];	
+			$tmpImage = "/tmp/" . uniqid() . "." . $ext;
+			if ( !copy( $imagePath , $tmpImage )) 
+			{
+				$this->eventService->deleteEvent( $event );
+				OW::getFeedback()->error($language->text('event', 'clone_event_image_error'));
+	            return;
+			}
+
+	        $this->eventService->saveEventImage( $tmpImage , $event->getImage() );
+			$this->eventService->saveEvent( $event );
+		}
 		
-		$this->eventService->saveEvent($event);
 
         $eventUser = new EVENT_BOL_EventUser();
         $eventUser->setEventId($event->getId());
@@ -65,7 +110,7 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->eventService->saveEventUser($eventUser);
 		
         $this->redirect(OW::getRouter()->urlForRoute('event.edit', array('eventId' => $event->getId())));
-	}
+    }
 
     /**
      * Add new event controller
@@ -712,6 +757,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         switch ( trim($params['list']) )
         {
+
             case 'created':
                 if ( !OW::getUser()->isAuthenticated() )
                 {
@@ -1096,6 +1142,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                 'invited' => array('iconClass' => 'ow_ic_bookmark'),
                 'joined' => array('iconClass' => 'ow_ic_friends'),
                 'past' => array('iconClass' => 'ow_ic_reply'),
+		        'calendar' => array('iconClass' => 'ow_ic_calendar_view'),
                 'latest' => array('iconClass' => 'ow_ic_calendar')
             );
         }
@@ -1103,6 +1150,7 @@ class EVENT_CTRL_Base extends OW_ActionController
         {
             $listNames = array(
                 'past' => array('iconClass' => 'ow_ic_reply'),
+		        'calendar' => array('iconClass' => 'ow_ic_reply'),
                 'latest' => array('iconClass' => 'ow_ic_calendar')
             );
         }
