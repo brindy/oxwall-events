@@ -1181,7 +1181,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                 'invited' => array('iconClass' => 'ow_ic_bookmark'),
                 'joined' => array('iconClass' => 'ow_ic_friends'),
                 'past' => array('iconClass' => 'ow_ic_reply'),
-		        'calendar' => array('iconClass' => 'ow_ic_calendar_view'),
+		'calendar' => array('iconClass' => 'ow_ic_calendar_view'),
                 'latest' => array('iconClass' => 'ow_ic_calendar')
             );
         }
@@ -1189,7 +1189,7 @@ class EVENT_CTRL_Base extends OW_ActionController
         {
             $listNames = array(
                 'past' => array('iconClass' => 'ow_ic_reply'),
-		        'calendar' => array('iconClass' => 'ow_ic_reply'),
+		'calendar' => array('iconClass' => 'ow_ic_calendar_view'),
                 'latest' => array('iconClass' => 'ow_ic_calendar')
             );
         }
