@@ -629,7 +629,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 			);
         }
 
-	if ( is_array( $editArray )) 
+	if ( isset($editArray) && is_array( $editArray )) 
 	{
 
 	    $this->assign('editArray', $editArray);
@@ -642,6 +642,8 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->setPageHeadingIconClass('ow_ic_calendar');
         OW::getDocument()->setDescription(UTIL_String::truncate(strip_tags($event->getDescription()), 200, '...'));
 
+        $googleDate = date("Ymd", $event->getStartTimeStamp()) . "/" . date("Ymd", $event->getEndTimeStamp());
+
         $infoArray = array(
             'id' => $event->getId(),
             'image' => ( $event->getImage() ? $this->eventService->generateImageUrl($event->getImage(), false) : null ),
@@ -653,7 +655,8 @@ class EVENT_CTRL_Base extends OW_ActionController
             'creatorName' => BOL_UserService::getInstance()->getDisplayName($event->getUserId()),
             'creatorLink' => BOL_UserService::getInstance()->getUserUrl($event->getUserId()),
 	    'attendeeLimit' => $event->getAttendeeLimit(),
-            'attendeeCount' => $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES ) 
+            'attendeeCount' => $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES ),
+	    'googleDate' => $googleDate
         );
 
         $this->assign('info', $infoArray);
