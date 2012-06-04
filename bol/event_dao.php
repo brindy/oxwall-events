@@ -101,6 +101,33 @@ class EVENT_BOL_EventDao extends OW_BaseDao
         return OW_DB_PREFIX . 'event_item';
     }
 
+    public function findByDate( $date ) 
+    {
+
+	$date = getdate( $date );
+
+	$startDate = mktime(23, 59, 59, $date['mon'], $date['mday'] - 1, $date['year']);
+	$endDate = mktime(23, 59, 59, $date['mon'], $date['mday'], $date['year']);
+
+	$where = " `" . self::WHO_CAN_VIEW . "` = :wcv ";
+        $params = array('wcv' => self::VALUE_WHO_CAN_VIEW_ANYBODY, 'startTime' => $startDate, 'endTime' => $endDate);
+
+        if ( OW::getUser()->isAuthorized('event') )
+        {
+            $params = array('startTime' => $startDate, 'endTime' => $endDate);
+            $where = " 1 ";
+        }
+
+	$timeClause = "`" . self::START_TIME_STAMP . "` > :startTime AND `" . self::START_TIME_STAMP . "` < :endTime";
+
+        $query = "SELECT * FROM `" . $this->getTableName() . "` WHERE " . $where . "
+                AND " . $timeClause . " ORDER BY `" . self::START_TIME_STAMP . "`";
+
+	   
+	return $this->dbo->queryForObjectList($query, $this->getDtoClassName(),
+            $params);
+    }
+
     /**
      * Returns latest public events.
      *

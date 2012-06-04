@@ -6,8 +6,41 @@
 {if !empty($contentMenu)}{$contentMenu}{/if}
 <div class="clearfix">
     <div class="ow_automargin ow_superwide">
+        <div style="text-align: right; margin-bottom: 10px;">
+	    {$monthName}
+        </div>
 
-	generate a calendar view
+	<table width="100%">
+        <tr>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+        </tr>
+
+	{foreach item=calDays from=$monthWeeks}
+	<tr>
+		{foreach item=calDay from=$calDays}
+		<td style="width: 100px; height:100px;"
+			class="
+			{if $calDay['month'] != $thisMonth}ow_alt1{/if}
+			{if $calDay['month'] == $thisMonth && $calDay['day'] == $today}ow_alt2{/if}
+			">
+			<span class="ow_ipc_header">{$calDay['day']}</span><br/>
+			{if isset($calDay['event']) }
+			<a href="{$calDay['event']['eventUrl']}"><span style="font-size: x-small">{$calDay['event']['title']}</span></a>
+			{/if}
+			{if $calDay['eventCount'] > 1}
+			<span style="font-size: x-small">and {$calDay['eventCount'] - 1} more</span>
+			{/if}
+		</td>
+		{/foreach}
+	</tr>
+	{/foreach}
+	</table>
 
     </div>
 </div>

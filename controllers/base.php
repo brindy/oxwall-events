@@ -60,16 +60,55 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->setPageTitle($language->text('event', 'calendar_events_page_title'));
         $this->setPageHeadingIconClass('ow_ic_calendar');
         OW::getDocument()->setDescription($language->text('event', 'calendar_events_page_desc'));
-  		// $thisMonthEvents = $this->eventService->findPublicEventsForCurrentMonth();
-  		// $nextMonthEvents = $this->eventService->findPublicEventsForCurrentMonth(+1);
+
+	$thisMonthCalendar = array();
+	
+	// what day of the week is the first?
+	$date = getdate();
+	$month = $date['mon'];
+	$year = $date['year'];
+
+	$day = 1;
+	do 
+	{
+		$time = mktime(0, 0, 0, $month, $day--, $year);
+		$date = getdate($time);
+	} 
+	while (1 != $date['wday']);
+
+	$weekMonth = $date['mon'];
+	while ($weekMonth <= $month)
+	{
+		$week = array();
+		for ($i = 0; $i < 7; $i++) 
+		{
+			$events = $this->eventService->findEventsByDate($time);
+			$eventListings = $this->eventService->getListingData($events);
+
+			$firstEvent = count($events) > 0 ? $eventListings[$events[0]->getId()] : null;
+
+			array_push($week, array(
+				'day' => $date['mday'],
+				'month' => $date['mon'],
+				'event' => $firstEvent,
+				'eventCount' => count($events)
+			));
+			$time = mktime(0, 0, 0, $weekMonth, $date['mday'] + 1, $date['year']);
+			$date = getdate($time);
+			$weekMonth = $date['mon'];
+		}
+		array_push($thisMonthCalendar, $week);
+	}
 
         if ( !OW::getUser()->isAuthorized('event', 'add_event') )
         {
             $this->assign('noButton', true);
         }
 
-//        $this->assign('thisMonthEvents', $thisMonthEvents);
-//        $this->assign('nextMonthEvents', $nextMonthEvents);
+	$this->assign('today', date("j"));
+	$this->assign('thisMonth', $month);
+        $this->assign('monthWeeks', $thisMonthCalendar);
+	$this->assign('monthName', date("F, Y"));
         $this->assign('add_new_url', OW::getRouter()->urlForRoute('event.add'));
         OW::getNavigation()->activateMenuItem(OW_Navigation::MAIN, 'event', 'main_menu_item');
     }
@@ -1500,7 +1539,7 @@ class EventAddForm extends Form
         $this->addElement($imageField);
 
 	$limitField = new TextField('limit');
-	$limitField->addValidator(new IntValidator( 1 ));
+	$limitField->addValidator(new IntValidator( 0 ));
 	$limitField->setLabel($language->text('event', 'limit'));
 	$this->addElement($limitField);
 

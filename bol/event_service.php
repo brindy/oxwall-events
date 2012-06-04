@@ -231,6 +231,11 @@ final class EVENT_BOL_EventService
         return $this->eventDao->findById((int) $id);
     }
 
+    public function findEventsByDate( $date )
+    {
+	return $this->eventDao->findByDate($date);
+    }
+
     /**
      * Returns event users with provided status.
      *
