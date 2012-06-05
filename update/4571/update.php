@@ -30,3 +30,12 @@
  */
 
 $errors = array();
+
+try
+{
+    Updater::getLanguageService()->importPrefixFromZip(dirname(__FILE__) . DS . 'langs.zip', 'event');
+}
+catch( Exception $e )
+{
+    $errors[] = $e;
+}
