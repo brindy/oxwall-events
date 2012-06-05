@@ -7,7 +7,7 @@
 <div class="clearfix">
     <div class="ow_automargin ow_superwide">
         <div style="text-align: right; margin-bottom: 10px;">
-	    {$monthName}
+	    <a href="{$prevMonth}">Previous</a> | {$monthName} | <a href="{$nextMonth}">Next</a>
         </div>
 
 	<table width="100%">
@@ -27,7 +27,7 @@
 		<td style="width: 100px; height:100px;"
 			class="
 			{if $calDay['month'] != $thisMonth}ow_alt1{/if}
-			{if $calDay['month'] == $thisMonth && $calDay['day'] == $today}ow_alt2{/if}
+			{if isset($today) && $calDay['month'] == $thisMonth && $calDay['day'] == $today}ow_alt2{/if}
 			">
 			<span class="ow_ipc_header">{$calDay['day']}</span><br/>
 			{if isset($calDay['event']) }

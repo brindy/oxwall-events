@@ -47,13 +47,30 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->eventService = EVENT_BOL_EventService::getInstance();
     }
 
-    public function calendarView() 
+    public function calendarView( $params ) 
     {
+	if ( !empty($params['month']) )
+	{
+	    $parts = explode("-", $params['month']); 
+            $timeToUse = mktime(0, 0, 0, $parts[0], 1, $parts[1]);
+	}
+	else
+	{
+	    $timeToUse = time();
+	} 
+
+        $date = getdate($timeToUse);
+        $month = $date['mon'];
+        $year = $date['year'];
+
+	$actualDate = getdate();
+	$isThisMonth = $actualDate['mon'] == $date['mon'] && $actualDate['year'] == $date['year'];
+
         $configs = $this->eventService->getConfigs();
 
         $language = OW::getLanguage();
 
-   		$contentMenu = $this->getContentMenu();
+   	$contentMenu = $this->getContentMenu();
         $contentMenu->getElement('calendar')->setActive(true);
         $this->addComponent('contentMenu', $contentMenu);
         $this->setPageHeading($language->text('event', 'calendar_events_page_heading'));
@@ -64,10 +81,6 @@ class EVENT_CTRL_Base extends OW_ActionController
 	$thisMonthCalendar = array();
 	
 	// what day of the week is the first?
-	$date = getdate();
-	$month = $date['mon'];
-	$year = $date['year'];
-
 	$day = 1;
 	do 
 	{
@@ -76,12 +89,16 @@ class EVENT_CTRL_Base extends OW_ActionController
 	} 
 	while (1 != $date['wday']);
 
+	// create an array of weeks => days => events
+	$targetMonth = ($year * 12) + $month;
 	$weekMonth = $date['mon'];
-	while ($weekMonth <= $month)
+	$checkMonth = ($date['year'] * 12) + $date['mon'];
+	while ($checkMonth <= $targetMonth)
 	{
 		$week = array();
 		for ($i = 0; $i < 7; $i++) 
 		{
+			// error_log("year = $year, month = $month, targetMonth = $targetMonth, weekMonth = $weekMonth, i=$i\n", 3, "/tmp/event.log");
 			$events = $this->eventService->findEventsByDate($time);
 			$eventListings = $this->eventService->getListingData($events);
 
@@ -93,9 +110,11 @@ class EVENT_CTRL_Base extends OW_ActionController
 				'event' => $firstEvent,
 				'eventCount' => count($events)
 			));
+
 			$time = mktime(0, 0, 0, $weekMonth, $date['mday'] + 1, $date['year']);
 			$date = getdate($time);
 			$weekMonth = $date['mon'];
+			$checkMonth = ($date['year'] * 12) + $date['mon'];
 		}
 		array_push($thisMonthCalendar, $week);
 	}
@@ -105,10 +124,20 @@ class EVENT_CTRL_Base extends OW_ActionController
             $this->assign('noButton', true);
         }
 
-	$this->assign('today', date("j"));
+	$todayInfo = getdate($timeToUse);
+	$nextMonth = sprintf("%d-%d", $todayInfo['mon'] + 1, $todayInfo['year']);
+	// error_log("next month: $nextMonth", 3, "/tmp/event.log");
+
+	$prevMonth = sprintf("%d-%d", $todayInfo['mon'] - 1, $todayInfo['year']); 
+	$this->assign('nextMonth', OW::getRouter()->urlForRoute("event.view_calendar_month", array( 'month' => $nextMonth )));
+	$this->assign('prevMonth', OW::getRouter()->urlForRoute("event.view_calendar_month", array( 'month' => $prevMonth )));
+
+        if ($isThisMonth) {
+	    $this->assign('today', date("j"));
+        }
 	$this->assign('thisMonth', $month);
         $this->assign('monthWeeks', $thisMonthCalendar);
-	$this->assign('monthName', date("F, Y"));
+	$this->assign('monthName', date("F, Y", $timeToUse));
         $this->assign('add_new_url', OW::getRouter()->urlForRoute('event.add'));
         OW::getNavigation()->activateMenuItem(OW_Navigation::MAIN, 'event', 'main_menu_item');
     }

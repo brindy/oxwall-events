@@ -43,6 +43,7 @@ $router->addRoute(new OW_Route('event.invite_accept', 'event/:eventId/:list/invi
 $router->addRoute(new OW_Route('event.invite_decline', 'event/:eventId/:list/invite_decline', 'EVENT_CTRL_Base', 'inviteListDecline'));
 $router->addRoute(new OW_Route('event.clone', 'event/:eventId/clone', 'EVENT_CTRL_Base', 'cloneEvent'));
 $router->addRoute(new OW_Route('event.view_calendar', 'events/calendar', 'EVENT_CTRL_Base', 'calendarView'));
+$router->addRoute(new OW_Route('event.view_calendar_month', 'events/calendar/:month', 'EVENT_CTRL_Base', 'calendarView'));
 
 /**inviteListAcept
  * Add notification actions to the collection
