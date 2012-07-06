@@ -89,7 +89,7 @@ margin-bottom:7px;
     {/block_decorator}
     {if !empty($inviteLink)}<div class="inviteLink ow_std_margin">{decorator name='button' class='ow_ic_add' type='button' langLabel='event+invite_btn_label' id='inviteLink'}</div>{/if}
     <div class="userList">{$userListCmp}</div>
-    <div style="text-align: center"><a href="http://www.google.com/calendar/event?action=TEMPLATE&text={$info.title|escape:'url'}&dates={$info.googleDate}&details={$info.desc|escape:'url'}&location={$info.location|escape:'url'}&trp=false&sprop=&sprop=name:" target="_blank"><img src="//www.google.com/calendar/images/ext/gc_button6.gif" border=0></a></div>
+    <div style="text-align: center"><a href="http://www.google.com/calendar/event?action=TEMPLATE&text={$info.googleTitle}&dates={$info.googleDate}&details={$info.googleDesc}&location={$info.googleLocation}&trp=false&sprop=&sprop=name:" target="_blank"><img src="//www.google.com/calendar/images/ext/gc_button6.gif" border=0></a></div>
 </div>
 <div class="ow_right ow_superwide">
 

@@ -668,10 +668,14 @@ class EVENT_CTRL_Base extends OW_ActionController
         OW::getNavigation()->activateMenuItem(OW_Navigation::MAIN, 'event', 'main_menu_item');
         $this->setPageHeading($event->getTitle());
         $this->setPageTitle(OW::getLanguage()->text('event', 'event_view_page_heading', array('event_title' => $event->getTitle())));
-        $this->setPageHeadingIconClass('ow_ic_calendar');
+        $this->setPageHeadingIconClass('ow_ic_calendar_view');
         OW::getDocument()->setDescription(UTIL_String::truncate(strip_tags($event->getDescription()), 200, '...'));
 
-        $googleDate = date("Ymd", $event->getStartTimeStamp()) . "/" . date("Ymd", $event->getEndTimeStamp());
+	// adjust for timezone
+	$startTimeStamp = $event->getStartTimeStamp();
+	$endTimeStamp = $event->getEndTimeStamp();
+
+        $googleDate = date("Ymd\THi00\Z", $startTimeStamp) . "/" . date("Ymd\THi00\Z", $endTimeStamp);
 
         $infoArray = array(
             'id' => $event->getId(),
@@ -685,7 +689,10 @@ class EVENT_CTRL_Base extends OW_ActionController
             'creatorLink' => BOL_UserService::getInstance()->getUserUrl($event->getUserId()),
 	    'attendeeLimit' => $event->getAttendeeLimit(),
             'attendeeCount' => $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES ),
-	    'googleDate' => $googleDate
+	    'googleDate' => $googleDate,
+	    'googleTitle' => urlencode(substr(html_entity_decode($event->getTitle()), 0, 50)),
+	    'googleDesc' => urlencode(substr(strip_tags(html_entity_decode($event->getDescription())), 0, 100)),
+	    'googleLocation' => urlencode(substr(html_entity_decode($event->getLocation()), 0, 50))
         );
 
         $this->assign('info', $infoArray);
@@ -1213,16 +1220,16 @@ class EVENT_CTRL_Base extends OW_ActionController
                 'invited' => array('iconClass' => 'ow_ic_bookmark'),
                 'joined' => array('iconClass' => 'ow_ic_friends'),
                 'past' => array('iconClass' => 'ow_ic_reply'),
-		'calendar' => array('iconClass' => 'ow_ic_calendar_view'),
-                'latest' => array('iconClass' => 'ow_ic_calendar')
+		'calendar' => array('iconClass' => 'ow_ic_calendar'),
+                'latest' => array('iconClass' => 'ow_ic_calendar_view')
             );
         }
         else
         {
             $listNames = array(
                 'past' => array('iconClass' => 'ow_ic_reply'),
-		'calendar' => array('iconClass' => 'ow_ic_calendar_view'),
-                'latest' => array('iconClass' => 'ow_ic_calendar')
+		'calendar' => array('iconClass' => 'ow_ic_calendar'),
+                'latest' => array('iconClass' => 'ow_ic_calendar_view')
             );
         }
 
