@@ -322,7 +322,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setEndDateFlag( !empty($_POST['endDateFlag']) );
                     $event->setStartTimeDisable( $data['start_time'] == 'all_day' );
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
-		    		$event->setAttendeeLimit( $data['limit'] );
+		    $event->setAttendeeLimit( $data['limit'] );
 
                     if ( $imagePosted )
                     {
@@ -551,7 +551,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setEndDateFlag(!empty($_POST['endDateFlag']));
                     $event->setStartTimeDisable( $data['start_time'] == 'all_day' );
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
-		    		$event->setAttendeeLimit( $data['limit'] );
+		    $event->setAttendeeLimit( $data['limit'] );
 
                     $this->eventService->saveEvent($event);
                     
@@ -697,13 +697,11 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         $this->assign('info', $infoArray);
 
-		if ( isset( $nfoArray['attendeeLimit'] )  && $infoArray['attendeeCount'] >= $infoArray['attendeeLimit'] )
+	if ( isset( $nfoArray['attendeeLimit'] )  && $infoArray['attendeeCount'] >= $infoArray['attendeeLimit'] )
         {
        	    $this->assign('event_full', true);
-	    	$eventFull = true;
+	    $eventFull = true;
         }
-
-	// TODO only show attend form if the event is not full OR the user has already replied YES
 
         // event attend form
         if ( OW::getUser()->isAuthenticated() && $event->getEndTimeStamp() > time() )
@@ -1285,7 +1283,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 
             $attendeeCount = $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES );
             $attendeeLimit = $event->getAttendeeLimit();
-            if ( isset( $attendeeLimit )  && $attendeeCount >= $event->getAttendeeLimit() )
+            if ( isset( $attendeeLimit )  && $attendeeLimit > 0 && $attendeeCount >= $attendeeLimit )
 	    {
 		if ( (int) $_POST['attend_status'] == EVENT_BOL_EventService::USER_STATUS_YES ) 
 		{
