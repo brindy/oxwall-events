@@ -98,7 +98,6 @@ class EVENT_CTRL_Base extends OW_ActionController
 		$week = array();
 		for ($i = 0; $i < 7; $i++) 
 		{
-			// error_log("year = $year, month = $month, targetMonth = $targetMonth, weekMonth = $weekMonth, i=$i\n", 3, "/tmp/event.log");
 			$events = $this->eventService->findEventsByDate($time);
 			$eventListings = $this->eventService->getListingData($events);
 
@@ -108,7 +107,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 				'day' => $date['mday'],
 				'month' => $date['mon'],
 				'event' => $firstEvent,
-				'eventCount' => count($events)
+				'eventCount' => (count($events) - 1)
 			));
 
 			$time = mktime(0, 0, 0, $weekMonth, $date['mday'] + 1, $date['year']);

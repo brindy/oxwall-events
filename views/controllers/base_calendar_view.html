@@ -33,8 +33,8 @@
 			{if isset($calDay['event']) }
 			<a href="{$calDay['event']['eventUrl']}"><span style="font-size: x-small">{$calDay['event']['title']}</span></a>
 			{/if}
-			{if $calDay['eventCount'] > 1}
-			<span style="font-size: x-small">and {$calDay['eventCount'] - 1} more</span>
+			{if $calDay['eventCount'] > 0}
+			<span style="font-size: x-small">and {$calDay['eventCount']} more</span>
 			{/if}
 		</td>
 		{/foreach}
