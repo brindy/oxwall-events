@@ -652,7 +652,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 					'label' => OW::getLanguage()->text('event', 'clone_button_label'),
 					'confirmMessage' => OW::getLanguage()->text('event', 'clone_confirm_message')
 				),
-			);
+			));
         }
         
         OW::getNavigation()->activateMenuItem(OW_Navigation::MAIN, 'event', 'main_menu_item');
