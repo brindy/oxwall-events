@@ -2,7 +2,7 @@
 
     {if empty($err_msg)}
 		{form name='event_add'}
-		<table class="ow_table_1 ow_form">
+		<table class="ow_table_1 ow_form ow_stdmargin">
             <tr class="ow_alt2">
 		        <td class="ow_label">{label name='title'}</td>
                 <td class="ow_value">{input name='title'}{error name='title'}</td>
@@ -55,15 +55,14 @@
 		        <td class="ow_desc ow_small">{text key='event+add_form_who_can_invite_desc'}</td>
 		    </tr>
 		    <tr>
-                        <td class="ow_label">{label name='limit'}</td>
-                        <td class="ow_value">{input name='limit'} <br /> {error name='limit'}</td>
-                        <td class="ow_desc ow_small">{text key='event+add_form_limit_desc'}</td>	
-                    </tr>
-		    <tr>
-		        <td colspan="3" class="ow_submit">{submit name='submit' class='ow_ic_add'}</td>
-		    </tr>
+                <td class="ow_label">{label name='limit'}</td>
+                <td class="ow_value">{input name='limit'} <br /> {error name='limit'}</td>
+                <td class="ow_desc ow_small">{text key='event+add_form_limit_desc'}</td>	
+            </tr>
 		</table>
-
+		<div class="clearfix ow_submit ow_stdmargin">
+			<div class="ow_right">{submit name='submit' class='ow_ic_add ow_positive'}</div>
+		</div>
 		{/form}
     {else}
         <div class="ow_anno ow_std_margin ow_nocontent">{$err_msg}</div>

@@ -639,12 +639,10 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         if ( OW::getUser()->isAuthorized('event') || OW::getUser()->getId() == $event->getUserId() )
         {
-             $editArray = array(
-                'edit' => array(
-					'url' => OW::getRouter()->urlForRoute('event.edit', array('eventId' => $event->getId())), 
-					'label' => OW::getLanguage()->text('event', 'edit_button_label')
-				),
-                'delete' => array(
+            $this->assign('editArray', array(
+                'edit' => array('url' => OW::getRouter()->urlForRoute('event.edit', array('eventId' => $event->getId())), 'label' => OW::getLanguage()->text('event', 'edit_button_label')),
+                'delete' =>
+                array(
                     'url' => OW::getRouter()->urlForRoute('event.delete', array('eventId' => $event->getId())),
                     'label' => OW::getLanguage()->text('event', 'delete_button_label'),
                     'confirmMessage' => OW::getLanguage()->text('event', 'delete_confirm_message')
@@ -656,13 +654,6 @@ class EVENT_CTRL_Base extends OW_ActionController
 				),
 			);
         }
-
-	if ( isset($editArray) && is_array( $editArray )) 
-	{
-
-	    $this->assign('editArray', $editArray);
-
-	}
         
         OW::getNavigation()->activateMenuItem(OW_Navigation::MAIN, 'event', 'main_menu_item');
         $this->setPageHeading($event->getTitle());
@@ -753,16 +744,13 @@ class EVENT_CTRL_Base extends OW_ActionController
             $this->assign('no_attend_form', true);
         }
 
-        $friends = array();
+        $friends = EVENT_BOL_EventService::getInstance()->findUserListForInvite($event->getId(), 0, 100);
         
         if ( OW::getEventManager()->call('plugin.friends') )
         {
-            $friends = OW::getEventManager()->call('plugin.friends.get_friend_list', array('userId' => OW::getUser()->getId()));
-            $friends = EVENT_BOL_EventService::getInstance()->findUserListForInvite($event->getId(), 0, 100, $friends);
-        }
-        else
-        {
-            $friends = EVENT_BOL_EventService::getInstance()->findUserListForInvite($event->getId(), 0, 100);
+            $friendList = OW::getEventManager()->call('plugin.friends.get_friend_list', array('userId' => OW::getUser()->getId()));
+            
+            $friends = array_intersect($friends, $friendList);
         }
         
         if ( $event->getEndTimeStamp() > time() && ((int) $event->getUserId() === OW::getUser()->getId() || ( (int) $event->getWhoCanInvite() === EVENT_BOL_EventService::CAN_INVITE_PARTICIPANT && $eventUser !== null) ) )
@@ -832,7 +820,6 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         switch ( trim($params['list']) )
         {
-
             case 'created':
                 if ( !OW::getUser()->isAuthenticated() )
                 {
