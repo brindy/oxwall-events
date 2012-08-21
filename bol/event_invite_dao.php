@@ -184,7 +184,7 @@ class EVENT_BOL_EventInviteDao extends OW_BaseDao
     		LEFT JOIN `" . BOL_UserApproveDao::getInstance()->getTableName() . "` as `d`
     			ON( `u`.`id` = `d`.`userId` )
 
-    		WHERE `e`.`id` IS NULL AND `ei`.`id` IS NULL AND `s`.`id` IS NULL AND `d`.`id` IS NULL ". $where ."
+    		WHERE `e`.`id` IS NULL AND `ei`.`id` IS NULL AND `s`.`id` IS NULL AND `d`.`id` IS NULL AND `eu`.`id` IS NULL ". $where ."
     		ORDER BY `u`.`activityStamp` DESC
     		LIMIT :first, :count ";
 

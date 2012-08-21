@@ -30,6 +30,5 @@
  */
 OW::getNavigation()->deleteMenuItem('event', 'main_menu_item');
 
-BOL_ComponentAdminService::getInstance()->deleteWidget('EVENT_CMP_MyEvents');
 BOL_ComponentAdminService::getInstance()->deleteWidget('EVENT_CMP_UpcomingEvents');
 BOL_ComponentAdminService::getInstance()->deleteWidget('EVENT_CMP_ProfilePageWidget');

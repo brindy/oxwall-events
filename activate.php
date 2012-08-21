@@ -30,10 +30,6 @@
  */
 OW::getNavigation()->addMenuItem(OW_Navigation::MAIN, 'event.main_menu_route', 'event', 'main_menu_item', OW_Navigation::VISIBLE_FOR_ALL);
 
-$widget = BOL_ComponentAdminService::getInstance()->addWidget('EVENT_CMP_MyEvents', false);
-$placeWidget = BOL_ComponentAdminService::getInstance()->addWidgetToPlace($widget, BOL_ComponentAdminService::PLACE_DASHBOARD);
-BOL_ComponentAdminService::getInstance()->addWidgetToPosition($placeWidget, BOL_ComponentAdminService::SECTION_RIGHT);
-
 $widget = BOL_ComponentAdminService::getInstance()->addWidget('EVENT_CMP_UpcomingEvents', false);
 $placeWidget = BOL_ComponentAdminService::getInstance()->addWidgetToPlace($widget, BOL_ComponentAdminService::PLACE_INDEX);
 BOL_ComponentAdminService::getInstance()->addWidgetToPosition($placeWidget, BOL_ComponentAdminService::SECTION_LEFT);
