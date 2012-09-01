@@ -11,7 +11,7 @@
 		    <tr class="ow_alt1">
 		        <td class="ow_label">{text key='event+add_form_date_label'}</td>
                 <td class="ow_value">
-                    <div class="clearfix">
+                    <div class="clearfix" id="start_date">
                         <div style="float:left;">{input name='start_date'}{error name='start_date'}</div>
                         <div style="float: left;padding-left: 4px;">{input name='start_time'}<br />{error name='start_time'}</div>
                     </div>
@@ -29,6 +29,30 @@
                 </td>
 		        <td class="ow_desc ow_small">{text key='event+add_form_end_date_desc'}</td>
 		    </tr>
+            <tr class="ow_alt1" >
+                        <td class="ow_label">{text key='event+add_form_open_date_label'} <input type="checkbox" name="openDateFlag" {if !empty($openDateFlag)} checked="checked"{/if} onclick="$('#open_date').toggle()" /></td>
+                        <td class="ow_value">
+                    <div class="clearfix" id="open_date" {if empty($openDateFlag)}style="display: none;"{/if}>
+                        <div style="float:left;">
+                            {input name='open_date'}{error name='open_date'}</div>
+                        <div style="float: left;padding-left: 4px;">{input name='open_time'}<br />{error name='open_time'}</div>
+                    </div>
+                </td>
+                        <td class="ow_desc ow_small">{text key='event+add_form_open_date_desc'}</td>
+                    </tr>
+            <tr class="ow_alt2">
+                        <td class="ow_label">{text key='event+add_form_close_date_label'} <input type="checkbox" name="closeDateFlag" {if !empty($closeDateFlag)} checked="checked"{/if} onclick="$('#close_date').toggle()" /></td>
+                        <td class="ow_value">
+                    <div class="clearfix" id="close_date" {if empty($closeDateFlag)}style="display: none;"{/if}>
+                        <div style="float:left;">
+                            {input name='close_date'}{error name='close_date'}</div>
+                        <div style="float: left;padding-left: 4px;">{input name='close_time'}<br />{error name='close_time'}</div>
+                    </div>
+                </td>
+                        <td class="ow_desc ow_small">{text key='event+add_form_close_date_desc'}</td>
+                    </tr>
+
+
             <tr class="ow_alt1">
 		        <td class="ow_label">{label name='desc'}</td>
 		        <td class="ow_value">{input name='desc'} <br /> {error name='desc'}</td>

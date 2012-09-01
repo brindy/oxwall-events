@@ -98,6 +98,34 @@ class EVENT_BOL_Event extends OW_Entity
      * @var integer
      */
     public $attendeeLimit = -1;
+    /**
+     * @var integer
+     */
+    public $openTimeStamp = 0;
+    /**
+     * @var integer
+     */
+    public $closeTimeStamp = 0;
+
+    public function getOpenTimeStamp()
+    {
+        return $this->openTimeStamp;
+    }
+
+    public function setOpenTimeStamp($timeStamp)
+    {
+    	$this->openTimeStamp = $timeStamp;
+    }
+
+    public function getCloseTimeStamp()
+    {
+        return $this->closeTimeStamp;
+    }
+
+    public function seCloseTimeStamp($timeStamp)
+    {
+        $this->closeTimeStamp = $timeStamp;
+    }
 
     public function getAttendeeLimit() 
     {

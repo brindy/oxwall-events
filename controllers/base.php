@@ -148,7 +148,6 @@ class EVENT_CTRL_Base extends OW_ActionController
 		$event->setId(null);
 		$this->eventService->saveEvent( $event );
 
-		// TODO test this!
 		if ( $event->getImage() ) 
 		{
 			$imagePath = $this->eventService->generateImagePath( $event->getImage(), false );
@@ -227,13 +226,18 @@ class EVENT_CTRL_Base extends OW_ActionController
         $form->getElement('start_time')->setValue('all_day');
         $form->getElement('end_time')->setValue('all_day');
 
+        $form->getElement('open_date')->setValue($defaultDate);
+        $form->getElement('close_date')->setValue($defaultDate);
+        $form->getElement('open_time')->setValue('00:00');
+        $form->getElement('close_time')->setValue('00:00');
+        
         $checkboxId = UTIL_HtmlTag::generateAutoId('chk');
         $tdId = UTIL_HtmlTag::generateAutoId('td');
         $this->assign('tdId', $tdId);
         $this->assign('chId', $checkboxId);
 
         OW::getDocument()->addScript(OW::getPluginManager()->getPlugin("event")->getStaticJsUrl() . 'event.js');
-        OW::getDocument()->addOnloadScript("new eventAddForm(". json_encode(array('checkbox_id' => $checkboxId, 'end_date_id' => $form->getElement('end_date')->getId(), 'tdId' => $tdId )) .")");
+        OW::getDocument()->addOnloadScript("new eventAddForm(". json_encode(array('checkbox_id' => $checkboxId, 'end_date_id' => $form->getElement('end_date')->getId(), 'tdId' => $tdId)) .")");
 
         if ( OW::getRequest()->isPost() )
         {
@@ -461,7 +465,7 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->assign('chId', $checkboxId);
         
         OW::getDocument()->addScript(OW::getPluginManager()->getPlugin("event")->getStaticJsUrl() . 'event.js');
-        OW::getDocument()->addOnloadScript("new eventAddForm(". json_encode(array('checkbox_id' => $checkboxId, 'end_date_id' => $form->getElement('end_date')->getId(), 'tdId' => $tdId )) .")");
+        OW::getDocument()->addOnloadScript("new eventAddForm(". json_encode(array('checkbox_id' => $checkboxId, 'end_date_id' => $form->getElement('end_date')->getId(), 'tdId' => $tdId)) .")");
 
         if ( $event->getImage() )
         {
@@ -1521,6 +1525,36 @@ class EventAddForm extends Form
         $endTime->setMilitaryTime($militaryTime);
         $this->addElement($endTime);
 
+        $openDate = new DateField('open_date');
+        $openDate->setMinYear($currentYear);
+        $openDate->setMaxYear($currentYear + 5);
+        $this->addElement($openDate);
+
+	$openTime = new EventTimeField('open_time', false);
+	$openTime->setMilitaryTime($militaryTime);
+	$this->addElement($openTime);
+
+        if ( !empty($_POST['openDateFlag']) )
+        {
+            $openDate->setRequired();
+            $openTime->setRequired();
+        }
+
+        $closeDate = new DateField('close_date');
+        $closeDate->setMinYear($currentYear);
+        $closeDate->setMaxYear($currentYear + 5);
+        $this->addElement($closeDate);
+
+        $closeTime = new EventTimeField('close_time', false);
+        $closeTime->setMilitaryTime($closeTime);
+        $this->addElement($closeTime);
+
+        if ( !empty($_POST['closeDateFlag']) )
+        {
+            $closeDate->setRequired();
+            $closeTime->setRequired();
+        }
+
         $location = new TextField('location');
         $location->setRequired();
         $location->setLabel($language->text('event', 'add_form_location_label'));
@@ -1584,15 +1618,18 @@ class EventTimeField extends FormElement
 
     private $allDay = false;
 
+    private $allowAllDay = true;
+
     /**
      * Constructor.
      *
      * @param string $name
      */
-    public function __construct( $name )
+    public function __construct( $name, $allowAllDay = true )
     {
         parent::__construct($name);
         $this->militaryTime = false;
+        $this->allowAllDay = $allowAllDay;
     }
 
     public function setMilitaryTime( $militaryTime )
@@ -1703,13 +1740,15 @@ class EventTimeField extends FormElement
         $optionsString = UTIL_HtmlTag::generateTag('option', array('value' => ""), true, OW::getLanguage()->text('event', 'time_field_invitation_label'));
 
         $allDayAttrs = array( 'value' => "all_day"  );
+       
+        if ( $this->allowAllDay) { 
+            if ( $this->allDay )
+            {
+                $allDayAttrs['selected'] = 'selected';
+            } 
         
-        if ( $this->allDay )
-        {
-            $allDayAttrs['selected'] = 'selected';
+            $optionsString = UTIL_HtmlTag::generateTag('option', $allDayAttrs, true, OW::getLanguage()->text('event', 'all_day'));
         }
-        
-        $optionsString = UTIL_HtmlTag::generateTag('option', $allDayAttrs, true, OW::getLanguage()->text('event', 'all_day'));
 
         foreach ( $valuesArray as $value => $labelArr )
         {

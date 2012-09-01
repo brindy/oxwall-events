@@ -65,6 +65,8 @@ OW::getDbo()->query("
   `endDateFlag` BOOL NOT NULL DEFAULT '0',
   `startTimeDisabled` BOOL NOT NULL DEFAULT '0',
   `endTimeDisabled` BOOL NOT NULL DEFAULT '0',
+  `openTimeStamp` int(11),
+  `closeTimeStamp` int(11),
   `attendeeLimit` int(11),
   PRIMARY KEY  (`id`),
   KEY `userId` (`userId`)
