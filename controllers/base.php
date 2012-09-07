@@ -231,7 +231,7 @@ class EVENT_CTRL_Base extends OW_ActionController
         $form->getElement('open_time')->setValue('00:00');
         $form->getElement('close_time')->setValue('00:00');
         
-        $checkboxId = UTIL_HtmlTag::generateAutoId('chk');
+       $checkboxId = UTIL_HtmlTag::generateAutoId('chk');
         $tdId = UTIL_HtmlTag::generateAutoId('td');
         $this->assign('tdId', $tdId);
         $this->assign('chId', $checkboxId);
@@ -249,8 +249,15 @@ class EVENT_CTRL_Base extends OW_ActionController
             if ( $form->isValid($_POST) )
             {
                 $data = $form->getValues();
-                $dateArray = explode('/', $data['start_date']);
 
+                $dateArray = explode('/', $data['open_date']);
+                $openStamp = mktime($data['open_time']['hour'], $data['open_time']['minute'], 0, $dateArray[1], $dateArray[2], $dateArray[0]);
+
+                $dateArray = explode('/', $data['close_date']);
+                $closeStamp = mktime($data['close_time']['hour'], $data['close_time']['minute'], 0, $dateArray[1], $dateArray[2], $dateArray[0]);
+
+
+                $dateArray = explode('/', $data['start_date']);
                 $startStamp = mktime(0, 0, 0, $dateArray[1], $dateArray[2], $dateArray[0]);
 
                 if ( $data['start_time'] != 'all_day' )
@@ -310,6 +317,18 @@ class EVENT_CTRL_Base extends OW_ActionController
                     OW::getFeedback()->error($language->text('event', 'add_form_invalid_end_date_error_message'));
                 }
 
+                if ( $openStamp > $endStamp )
+                {
+                    $datesAreValid = false;
+                    OW::getFeedback()->error($language->text('event', 'add_form_invalid_open_date_error_message'));
+                }
+
+                if ( $closeStamp < $openStamp )
+                {
+                    $datesAreValid = false;
+                    OW::getFeedback()->error($language->text('event', 'add_form_invalid_close_date_error_message'));
+                }
+
                 if ( $imageValid && $datesAreValid )
                 {
                     $event = new EVENT_BOL_Event();
@@ -326,6 +345,8 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setStartTimeDisable( $data['start_time'] == 'all_day' );
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
 		    $event->setAttendeeLimit( $data['limit'] );
+                    $event->setOpenTimeStamp( $openStamp );
+                    $event->setCloseTimeStamp( $closeStamp );
 
                     if ( $imagePosted )
                     {
@@ -423,13 +444,25 @@ class EVENT_CTRL_Base extends OW_ActionController
         $form->getElement('location')->setValue($event->getLocation());
         $form->getElement('who_can_view')->setValue($event->getWhoCanView());
         $form->getElement('who_can_invite')->setValue($event->getWhoCanInvite());
-        $form->getElement('limit')->setValue($event->getAttendeeLimit());
+
+        $limit = $event->getAttendeeLimit();
+        $form->getElement('limit')->setValue($limit > 0 ? $limit : '');
 
         $startTimeArray = array('hour' => date('G', $event->getStartTimeStamp()), 'minute' => date('i', $event->getStartTimeStamp()));
         $form->getElement('start_time')->setValue($startTimeArray);
 
         $startDate = date('Y', $event->getStartTimeStamp()) . '/' . date('n', $event->getStartTimeStamp()) . '/' . date('j', $event->getStartTimeStamp());
         $form->getElement('start_date')->setValue($startDate);
+
+        $openTimeArray = array('hour' => date('G', $event->getOpenTimeStamp()), 'minute' => date('i', $event->getOpenTimeStamp()));
+        $form->getElement('open_time')->setValue($openTimeArray);
+        $openDate = date('Y', $event->getOpenTimeStamp()) . '/' . date('n', $event->getOpenTimeStamp()) . '/' . date('j', $event->getOpenTimeStamp());
+        $form->getElement('open_date')->setValue($openDate);
+
+        $closeTimeArray = array('hour' => date('G', $event->getCloseTimeStamp()), 'minute' => date('i', $event->getCloseTimeStamp()));
+        $form->getElement('close_time')->setValue($closeTimeArray);
+        $closeDate = date('Y', $event->getCloseTimeStamp()) . '/' . date('n', $event->getCloseTimeStamp()) . '/' . date('j', $event->getCloseTimeStamp());
+        $form->getElement('close_date')->setValue($closeDate);
 
         if ( $event->getEndTimeStamp() !== null )
         {
@@ -483,6 +516,15 @@ class EVENT_CTRL_Base extends OW_ActionController
             if ( $form->isValid($_POST) )
             {
                 $data = $form->getValues();
+
+                $dateArray = explode('/', $data['open_date']);
+                $openStamp = mktime($data['open_time']['hour'], $data['open_time']['minute'], 0, $dateArray[1], $dateArray[2], $dateArray[0]);
+                $event->setOpenTimeStamp($openStamp);
+
+	        $dateArray = explode('/', $data['close_date']);
+                $closeStamp = mktime($data['close_time']['hour'], $data['close_time']['minute'], 0, $dateArray[1], $dateArray[2], $dateArray[0]);	
+                $event->setCloseTimeStamp($closeStamp);
+
                 $dateArray = explode('/', $data['start_date']);
 
                 $startStamp = mktime(0, 0, 0, $dateArray[1], $dateArray[2], $dateArray[0]);
@@ -522,12 +564,26 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $endStamp = mktime(0, 0, 0, date('n',$endStamp), date('j',$endStamp), date('Y',$endStamp));
                 }
                 
+                $ok = true;
                 if ( $startStamp > $endStamp )
                 {
                     OW::getFeedback()->error($language->text('event', 'add_form_invalid_end_date_error_message'));
-                    //$this->redirect();
+                    $ok = false;
                 }
-                else
+
+                if ( $openStamp > $endStamp ) 
+                {
+                    OW::getFeedback()->error($language->text('event', 'add_form_invalid_open_date_error_message'));
+                    $ok = false;
+                }
+
+                if ( $closeStamp < $openStamp ) 
+                {
+                    OW::getFeedback()->error($language->text('event', 'add_form_invalid_close_date_error_message'));
+                    $ok = false;
+                }
+
+                if ($ok)
                 {
                     $event->setEndTimeStamp($endStamp);
 
@@ -665,11 +721,21 @@ class EVENT_CTRL_Base extends OW_ActionController
         $this->setPageHeadingIconClass('ow_ic_calendar_view');
         OW::getDocument()->setDescription(UTIL_String::truncate(strip_tags($event->getDescription()), 200, '...'));
 
-	// adjust for timezone
 	$startTimeStamp = $event->getStartTimeStamp();
 	$endTimeStamp = $event->getEndTimeStamp();
 
-        $googleDate = date("Ymd\THi00\Z", $startTimeStamp) . "/" . date("Ymd\THi00\Z", $endTimeStamp);
+        $googleDate = date("Ymd\THi00\ZA", $startTimeStamp) . "/" . date("Ymd\THi00\Z", $endTimeStamp);
+
+        if ($this->isClosed($event)) 
+        {
+            $this->assign('event_closed', true);
+
+            // if user is already a no, don't show the form
+            if ($eventUser->getStatus() == EVENT_BOL_EventService::USER_STATUS_NO) 
+            {
+                $this->assign('no_attend_form', true);
+            }
+        }
 
         $infoArray = array(
             'id' => $event->getId(),
@@ -695,6 +761,11 @@ class EVENT_CTRL_Base extends OW_ActionController
         {
        	    $this->assign('event_full', true);
 	    $eventFull = true;
+        }
+
+        if ($event->getOpenTimeStamp() > time()) 
+        {
+           $this->assign('event_open', UTIL_DateTime::formatSimpleDate($event->getOpenTimeStamp()));
         }
 
         // event attend form
@@ -1234,6 +1305,11 @@ class EVENT_CTRL_Base extends OW_ActionController
         return new BASE_CMP_ContentMenu($menuItems);
     }
 
+    private function isClosed($event) 
+    {
+        return $event->getOpenTimeStamp() > time() || $event->getCloseTimeStamp() < time();
+    }
+
     /**
      * Responder for event attend form
      */
@@ -1264,12 +1340,10 @@ class EVENT_CTRL_Base extends OW_ActionController
                 exit(json_encode($respondArray));
             }
 
-//		author *can* leave the event, for instance if setting up for someone else
-//            if ( $event->getUserId() == OW::getUser()->getId() && (int) $_POST['attend_status'] == EVENT_BOL_EventService::USER_STATUS_NO )
-//            {
-//                $respondArray['message'] = OW::getLanguage()->text('event', 'user_status_author_cant_leave_error');
-//                exit(json_encode($respondArray));
-//            }
+            if ($this->isClosed($event) && (int) $_POST['attend_status'] !== EVENT_BOL_EventService::USER_STATUS_NO ) {
+                $respondArray['message'] = OW::getLanguage()->text('event', 'event_is_closed_error');
+                exit(json_encode($respondArray));
+            }
 
             $attendeeCount = $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES );
             $attendeeLimit = $event->getAttendeeLimit();
@@ -1534,11 +1608,8 @@ class EventAddForm extends Form
 	$openTime->setMilitaryTime($militaryTime);
 	$this->addElement($openTime);
 
-        if ( !empty($_POST['openDateFlag']) )
-        {
-            $openDate->setRequired();
-            $openTime->setRequired();
-        }
+        $openDate->setRequired();
+        $openTime->setRequired();
 
         $closeDate = new DateField('close_date');
         $closeDate->setMinYear($currentYear);
@@ -1549,11 +1620,8 @@ class EventAddForm extends Form
         $closeTime->setMilitaryTime($closeTime);
         $this->addElement($closeTime);
 
-        if ( !empty($_POST['closeDateFlag']) )
-        {
-            $closeDate->setRequired();
-            $closeTime->setRequired();
-        }
+        $closeDate->setRequired();
+        $closeTime->setRequired();
 
         $location = new TextField('location');
         $location->setRequired();

@@ -15,21 +15,25 @@ var eventAddForm = function( $params )
     $('div#start_date select[name=month_start_date]')
         .change(function() {
             $('div#close_date select[name=month_close_date]').val($(this).val());
+            $('div#close_date select[name=month_close_date]').change();
         });
 
     $('div#start_date select[name=day_start_date]')
         .change(function() {
             $('div#close_date select[name=day_close_date]').val($(this).val());
+            $('div#close_date select[name=day_close_date]').change();
         });
 
     $('div#start_date select[name=year_start_date]')
         .change(function() {
             $('div#close_date select[name=year_close_date]').val($(this).val());
+            $('div#close_date select[name=year_close_date]').change();
         });
 
     $('div#start_date select[name=start_time]')
         .change(function() {
             $('div#close_date select[name=close_time]').val($(this).val());
+            $('div#close_date select[name=close_time]').change();
         });
 
     $('#' + $params['checkbox_id']).click(

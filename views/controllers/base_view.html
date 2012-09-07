@@ -36,8 +36,10 @@ margin-bottom:7px;
 	    <div class="current_status"><span class="status">{if !empty($currentStatus)}{$currentStatus}{/if}</span> <span class="link"{if empty($currentStatus)} style="display:none;"{/if}>(<a href="javascript://">{text key='event+current_status_change_label'}</a>)</span></div>
         <div class="buttons"{if !empty($currentStatus)} style="display:none;"{/if}>
              {form name='event_attend'}
+               {if empty($event_closed)} 
                  {decorator name='button' class='ow_ic_ok' type='submit' langLabel='event+attend_yes_btn_label' id='event_attend_yes_btn'}
                  {decorator name='button' class='ow_ic_flag' type='submit' langLabel='event+attend_maybe_btn_label' id='event_attend_maybe_btn'}
+               {/if}
                  {decorator name='button' class='ow_ic_warning' type='submit' langLabel='event+attend_no_btn_label' id='event_attend_no_btn'}
              {/form}
     </div>
@@ -85,6 +87,18 @@ margin-bottom:7px;
             </td>
 	</tr>
 	{/if}
+        {if !empty($event_closed)}
+        <tr>
+            <td class="ow_label" style="width: 25%">{text key='event+view_page_state'}</td>
+            <td class="ow_value">{text key='event+event_view_page_state_closed'}</td>
+        </tr>
+        {/if}
+        {if !empty($event_open) }
+        <tr>
+            <td class="ow_label" style="width: 25%">{text key='event+view_page_event_open'}</td>
+            <td class="ow_value">{$event_open}</td>
+        </tr>
+        {/if}
     </table>
     {/block_decorator}
     {if !empty($inviteLink)}<div class="inviteLink ow_std_margin">{decorator name='button' class='ow_ic_add' type='button' langLabel='event+invite_btn_label' id='inviteLink'}</div>{/if}

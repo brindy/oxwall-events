@@ -122,7 +122,7 @@ class EVENT_BOL_Event extends OW_Entity
         return $this->closeTimeStamp;
     }
 
-    public function seCloseTimeStamp($timeStamp)
+    public function setCloseTimeStamp($timeStamp)
     {
         $this->closeTimeStamp = $timeStamp;
     }
