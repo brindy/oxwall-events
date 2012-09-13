@@ -125,7 +125,8 @@ function event_feed_entity_add( OW_Event $e )
 //    }
 
     $url = OW::getRouter()->urlForRoute('event.view', array('eventId' => $event->getId()));
-    $thumb = $eventService->generateImageUrl($event->image, true);
+
+    $thumb = ( $event->getImage() ? $eventService->generateImageUrl($event->getImage(), true) : $eventService->generateDefaultImageUrl() );
 
     $title = UTIL_String::truncate(strip_tags($event->getTitle()), 100, "...");
     
@@ -135,7 +136,7 @@ function event_feed_entity_add( OW_Event $e )
         'ownerId' => $event->getUserId(),
         'string' => OW::getLanguage()->text('event', 'feed_add_item_label'),
         'content' => '<div class="clearfix"><div class="ow_newsfeed_item_picture">
-            <a href="' . $url . '"><img src="' . ( $event->getImage() ? $eventService->generateImageUrl($event->getImage(), true) : $eventService->generateDefaultImageUrl() ) . '" /></a>
+            <a href="' . $url . '"><img src="' . $thumb . '" /></a>
             </div><div class="ow_newsfeed_item_content">
             <a class="ow_newsfeed_item_title" href="' . $url . '">' . $title . '</a><div class="ow_remark ow_smallmargin">' . UTIL_String::truncate(strip_tags($event->getDescription()), 200, '...') . '</div><div class="ow_newsfeed_action_activity event_newsfeed_activity">[ph:activity]</div></div></div>',
         'view' => array(
@@ -161,7 +162,7 @@ function event_after_event_edit( OW_Event $event )
     $event = $eventService->findEvent($evemtId);
 
     $url = OW::getRouter()->urlForRoute('event.view', array('eventId' => $event->getId()));
-    $thumb = $eventService->generateImageUrl($event->image, true);
+    $thumb = ( $event->getImage() ? $eventService->generateImageUrl($event->getImage(), true) : $eventService->generateDefaultImageUrl() );
 
     $data = array(
         'time' => $event->getCreateTimeStamp(),

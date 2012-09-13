@@ -821,7 +821,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         $friends = EVENT_BOL_EventService::getInstance()->findUserListForInvite($event->getId(), 0, 100);
         
-        if ( OW::getEventManager()->call('plugin.friends') )
+        if ( OW::getEventManager()->call('plugin.friends') && OW::getUser()->isAuthenticated() )
         {
             $friendList = OW::getEventManager()->call('plugin.friends.get_friend_list', array('userId' => OW::getUser()->getId()));
             
