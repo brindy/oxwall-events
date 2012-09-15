@@ -450,3 +450,27 @@ function event_add_comment( OW_Event $e )
 }
 
 OW::getEventManager()->bind('base_add_comment', 'event_add_comment');
+
+
+function event_quick_links( BASE_CLASS_EventCollector $event )
+{
+    $service = EVENT_BOL_EventService::getInstance();
+    $userId = OW::getUser()->getId();
+    $username = OW::getUser()->getUserObject()->getUsername();
+
+    $eventsAttendingCount = (int) $service->findUsersEventsCount($userId);
+
+    if ( $eventsAttendingCount > 0 )
+    {
+        $event->add(array(
+            BASE_CMP_QuickLinksWidget::DATA_KEY_LABEL => OW::getLanguage()->text('event', 'events_am_attending'),
+            BASE_CMP_QuickLinksWidget::DATA_KEY_URL => OW::getRouter()->urlForRoute('event.view_event_list', array( 'list' => 'joined' )),
+            BASE_CMP_QuickLinksWidget::DATA_KEY_COUNT => $eventsAttendingCount,
+            BASE_CMP_QuickLinksWidget::DATA_KEY_COUNT_URL => OW::getRouter()->urlForRoute('event.view_event_list', array( 'list' => 'joined' )),
+        ));
+    }
+}
+OW::getEventManager()->bind(BASE_CMP_QuickLinksWidget::EVENT_NAME, 'event_quick_links');
+
+
+
