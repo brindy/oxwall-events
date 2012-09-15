@@ -731,7 +731,7 @@ class EVENT_CTRL_Base extends OW_ActionController
             $this->assign('event_closed', true);
 
             // if user is already a no, don't show the form
-            if ($eventUser->getStatus() == EVENT_BOL_EventService::USER_STATUS_NO) 
+            if (!$eventUser || $eventUser->getStatus() == EVENT_BOL_EventService::USER_STATUS_NO) 
             {
                 $this->assign('no_attend_form', true);
             }
