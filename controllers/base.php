@@ -682,7 +682,7 @@ class EVENT_CTRL_Base extends OW_ActionController
             return;
         }
 
-        // guest gan't view private events
+        // guest can't view private events
         if ( (int) $event->getWhoCanView() === EVENT_BOL_EventService::CAN_VIEW_INVITATION_ONLY && !OW::getUser()->isAuthenticated() )
         {
             $this->redirect(OW::getRouter()->urlForRoute('event.private_event', array('eventId' => $event->getId())));

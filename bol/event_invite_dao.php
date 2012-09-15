@@ -168,26 +168,19 @@ class EVENT_BOL_EventInviteDao extends OW_BaseDao
             $where = " AND `u`.id IN ( " . $this->dbo->mergeInClause($friendList) . " ) ";
         }
 
-        $query = "SELECT `u`.`id`
-    		FROM `{$userDao->getTableName()}` as `u`
-            LEFT JOIN `" . $eventDao->getTableName() . "` as `e`
-    			ON( `u`.`id` = `e`.`userId` AND e.id = :event )
-            LEFT JOIN `" . $this->getTableName() . "` as `ei`
-    			ON( `u`.`id` = `ei`.`userId` AND `ei`.eventId = :event )
+        $query = "SELECT `u`.*
+                FROM `{$userDao->getTableName()}` as `u`
+                LEFT JOIN `" . BOL_UserSuspendDao::getInstance()->getTableName() . "` as `s`
+                        ON( `u`.`id` = `s`.`userId` )
 
-            LEFT JOIN `" . $eventUserDao->getTableName() . "` as `eu`
-    			ON( `u`.`id` = `eu`.`userId` AND `eu`.eventId = :event )
+                LEFT JOIN `" . BOL_UserApproveDao::getInstance()->getTableName() . "` as `d`
+                        ON( `u`.`id` = `d`.`userId` )
 
-    		LEFT JOIN `" . BOL_UserSuspendDao::getInstance()->getTableName() . "` as `s`
-    			ON( `u`.`id` = `s`.`userId` )
+                WHERE `s`.`id` IS NULL AND `d`.`id` IS NULL
+                ORDER BY `u`.`joinStamp` DESC
+                LIMIT :first, :count
+                ";
 
-    		LEFT JOIN `" . BOL_UserApproveDao::getInstance()->getTableName() . "` as `d`
-    			ON( `u`.`id` = `d`.`userId` )
-
-    		WHERE `e`.`id` IS NULL AND `ei`.`id` IS NULL AND `s`.`id` IS NULL AND `d`.`id` IS NULL AND `eu`.`id` IS NULL ". $where ."
-    		ORDER BY `u`.`activityStamp` DESC
-    		LIMIT :first, :count ";
-
-        return $this->dbo->queryForColumnList($query, array('event' => $eventId, 'first' => $first, 'count' => $count));
+        return $this->dbo->queryForColumnList($query, array('first' => $first, 'count' => $count));
     }
 }
