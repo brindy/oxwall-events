@@ -346,7 +346,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $event->setEndTimeDisable( $data['end_time'] == 'all_day' );
 		    $event->setAttendeeLimit( $data['limit'] );
                     $event->setOpenTimeStamp( $openStamp );
-                    $event->setCloseTimeStamp( $closeStamp );
+                    $event->setClosedTimeStamp( $closeStamp );
 
                     if ( $imagePosted )
                     {
@@ -459,9 +459,9 @@ class EVENT_CTRL_Base extends OW_ActionController
         $openDate = date('Y', $event->getOpenTimeStamp()) . '/' . date('n', $event->getOpenTimeStamp()) . '/' . date('j', $event->getOpenTimeStamp());
         $form->getElement('open_date')->setValue($openDate);
 
-        $closeTimeArray = array('hour' => date('G', $event->getCloseTimeStamp()), 'minute' => date('i', $event->getCloseTimeStamp()));
-        $form->getElement('close_time')->setValue($closeTimeArray);
-        $closeDate = date('Y', $event->getCloseTimeStamp()) . '/' . date('n', $event->getCloseTimeStamp()) . '/' . date('j', $event->getCloseTimeStamp());
+        $closedTimeArray = array('hour' => date('G', $event->getClosedTimeStamp()), 'minute' => date('i', $event->getClosedTimeStamp()));
+        $form->getElement('close_time')->setValue($closedTimeArray);
+        $closeDate = date('Y', $event->getClosedTimeStamp()) . '/' . date('n', $event->getClosedTimeStamp()) . '/' . date('j', $event->getClosedTimeStamp());
         $form->getElement('close_date')->setValue($closeDate);
 
         if ( $event->getEndTimeStamp() !== null )
@@ -523,7 +523,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 
 	        $dateArray = explode('/', $data['close_date']);
                 $closeStamp = mktime($data['close_time']['hour'], $data['close_time']['minute'], 0, $dateArray[1], $dateArray[2], $dateArray[0]);	
-                $event->setCloseTimeStamp($closeStamp);
+                $event->setClosedTimeStamp($closeStamp);
 
                 $dateArray = explode('/', $data['start_date']);
 
@@ -1307,7 +1307,7 @@ class EVENT_CTRL_Base extends OW_ActionController
 
     private function isClosed($event) 
     {
-        return $event->getOpenTimeStamp() > time() || $event->getCloseTimeStamp() < time();
+        return $event->getOpenTimeStamp() > time() || $event->getClosedTimeStamp() < time();
     }
 
     /**
@@ -1616,12 +1616,12 @@ class EventAddForm extends Form
         $closeDate->setMaxYear($currentYear + 5);
         $this->addElement($closeDate);
 
-        $closeTime = new EventTimeField('close_time', false);
-        $closeTime->setMilitaryTime($closeTime);
-        $this->addElement($closeTime);
+        $closedTime = new EventTimeField('close_time', false);
+        $closedTime->setMilitaryTime($closedTime);
+        $this->addElement($closedTime);
 
         $closeDate->setRequired();
-        $closeTime->setRequired();
+        $closedTime->setRequired();
 
         $location = new TextField('location');
         $location->setRequired();

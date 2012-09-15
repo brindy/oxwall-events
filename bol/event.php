@@ -105,7 +105,7 @@ class EVENT_BOL_Event extends OW_Entity
     /**
      * @var integer
      */
-    public $closeTimeStamp = 0;
+    public $closedTimeStamp = 0;
 
     public function getOpenTimeStamp()
     {
@@ -117,14 +117,14 @@ class EVENT_BOL_Event extends OW_Entity
     	$this->openTimeStamp = $timeStamp;
     }
 
-    public function getCloseTimeStamp()
+    public function getClosedTimeStamp()
     {
-        return $this->closeTimeStamp;
+        return $this->closedTimeStamp;
     }
 
-    public function setCloseTimeStamp($timeStamp)
+    public function setClosedTimeStamp($timeStamp)
     {
-        $this->closeTimeStamp = $timeStamp;
+        $this->closedTimeStamp = $timeStamp;
     }
 
     public function getAttendeeLimit() 

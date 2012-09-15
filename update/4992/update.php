@@ -37,6 +37,7 @@ try
 {
     Updater::getDbo()->query("ALTER TABLE `" . OW_DB_PREFIX . "event_item` ADD `openTimeStamp` int(11)");
     Updater::getDbo()->query("ALTER TABLE `" . OW_DB_PREFIX . "event_item` ADD `closedTimeStamp` int(11)");
+    Updater::getDbo()->query("UPDATE `" . OW_DB_PREFIX . "event_item` SET `closedTimeStamp` = `startTimeStamp`");
 }
 catch( Exception $e )
 {
