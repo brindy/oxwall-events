@@ -827,7 +827,48 @@ class EVENT_CTRL_Base extends OW_ActionController
             
             $friends = array_intersect($friends, $friendList);
         }
+
+	if (false)
+        if ((int) $event->getUserId() === OW::getUser()->getId())
+        {
+            $params = array(
+                $event->getId()
+            );
+
+            $this->assign('manageLink', true);
+            OW::getDocument()->addOnloadScript("
+                var manageFloatBox;
+                $('#manageLink', $('#" . $cmpId . "')).click(
+                    function(){
+                        eventFloatBox = OW.ajaxFloatBox('EVENT_CMP_ManageRsvps', " . json_encode($params) . ", {width:600, height:400, iconClass: 'ow_ic_user', title: '" . OW::getLanguage()->text('event', 'manage_button_label') . "'});
+                    }
+                );
+                OW.bind('base.avatar_user_list_select',
+                    function(list){
+                        manageFloatBox.close();
+                        $.ajax({
+                            type: 'POST',
+                            url: " . json_encode(OW::getRouter()->urlFor('EVENT_CTRL_Base', 'inviteResponder')) . ",
+                            data: 'eventId=" . json_encode($event->getId()) . "&userIdList='+JSON.stringify(list),
+                            dataType: 'json',
+                            success : function(data){
+                                if( data.messageType == 'error' ){
+                                    OW.error(data.message);
+                                }
+                                else{
+                                    OW.info(data.message);
+                                }
+                            },
+                            error : function( XMLHttpRequest, textStatus, errorThrown ){
+                                OW.error(textStatus);
+                            }
+                        });
+                    }
+                );
+            ");
         
+        }
+      
         if ( $event->getEndTimeStamp() > time() && ((int) $event->getUserId() === OW::getUser()->getId() || ( (int) $event->getWhoCanInvite() === EVENT_BOL_EventService::CAN_INVITE_PARTICIPANT && $eventUser !== null) ) )
         {
             $params = array(
@@ -1067,6 +1108,13 @@ class EVENT_CTRL_Base extends OW_ActionController
             {
                 $feedback['message'] = OW::getLanguage()->text('event', 'user_status_author_cant_leave_error');
                 //exit(json_encode($feedback));
+            }
+
+            if ( $this->eventService->findEventUsersCount( $event->id, EVENT_BOL_EventService::USER_STATUS_YES ) >= $event->getAttendeeLimit() )
+            {
+                $feedback['message'] = OW::getLanguage()->text('event', 'user_status_event_full_error');
+                $feedback['messageType'] = 'error';
+                $exit = true;
             }
 
             if ( !$exit )
