@@ -828,7 +828,6 @@ class EVENT_CTRL_Base extends OW_ActionController
             $friends = array_intersect($friends, $friendList);
         }
 
-	if (false)
         if ((int) $event->getUserId() === OW::getUser()->getId())
         {
             $params = array(
@@ -838,33 +837,43 @@ class EVENT_CTRL_Base extends OW_ActionController
             $this->assign('manageLink', true);
             OW::getDocument()->addOnloadScript("
                 var manageFloatBox;
-                $('#manageLink', $('#" . $cmpId . "')).click(
+                $('#manageLink').click(
                     function(){
-                        eventFloatBox = OW.ajaxFloatBox('EVENT_CMP_ManageRsvps', " . json_encode($params) . ", {width:600, height:400, iconClass: 'ow_ic_user', title: '" . OW::getLanguage()->text('event', 'manage_button_label') . "'});
+                        manageFloatBox = OW.ajaxFloatBox('EVENT_CMP_ManageRsvps', " . json_encode($params) . ", {width:600, height:400, iconClass: 'ow_ic_user', title: '" . OW::getLanguage()->text('event', 'manage_button_label') . "'});
                     }
                 );
-                OW.bind('base.avatar_user_list_select',
-                    function(list){
-                        manageFloatBox.close();
-                        $.ajax({
-                            type: 'POST',
-                            url: " . json_encode(OW::getRouter()->urlFor('EVENT_CTRL_Base', 'inviteResponder')) . ",
-                            data: 'eventId=" . json_encode($event->getId()) . "&userIdList='+JSON.stringify(list),
-                            dataType: 'json',
-                            success : function(data){
-                                if( data.messageType == 'error' ){
-                                    OW.error(data.message);
-                                }
-                                else{
-                                    OW.info(data.message);
-                                }
-                            },
-                            error : function( XMLHttpRequest, textStatus, errorThrown ){
-                                OW.error(textStatus);
+                OW.bind('event.manage_user', function( \$eventId, \$userId, \$toStatus )
+                {
+                    $('#response_' + \$userId + '_1').removeClass('currentSelection');
+                    $('#response_' + \$userId + '_2').removeClass('currentSelection');
+                    $('#response_' + \$userId + '_3').removeClass('currentSelection');
+
+                    $('#response_' + \$userId + '_' + \$toStatus).addClass('currentSelection');
+
+                    $.ajax({
+                        type: 'POST',
+                        url: " . json_encode(OW::getRouter()->urlFor('EVENT_CTRL_Base', 'manageInviteResponder')) . ",
+                        data: 'eventId=" . json_encode($event->getId()) . "&userId=' + \$userId + '&status=' + \$toStatus,
+                        dataType: 'json',
+                        success : function(data){
+                            if( data.messageType == 'error' )
+                            {
+                                OW.error(data.message);
                             }
-                        });
-                    }
-                );
+                            else
+                            {
+                                OW.info(data.message);
+                            }
+                        },
+                        error : function( XMLHttpRequest, textStatus, errorThrown )
+                        {
+                            OW.error(textStatus);
+                        }
+                    });
+
+
+                });
+
             ");
         
         }
@@ -1488,6 +1497,45 @@ class EVENT_CTRL_Base extends OW_ActionController
         {
             $respondArray['message'] = OW::getLanguage()->text('event', 'user_status_update_error');
         }
+
+        exit(json_encode($respondArray));
+    }
+
+    public function manageInviteResponder() {
+        $eventId = $_POST['eventId'];
+        $userId = $_POST['userId'];
+        $status = $_POST['status'];
+
+        if ( empty($eventId) || empty($userId) || empty($status) || !OW::getUser()->isAuthenticated())
+        {
+            $respondArray['messageType'] = 'error';
+            $respondArray['message'] = '_ERROR_ 1';
+            echo json_encode($respondArray);
+            exit;
+        }
+
+        $event = $this->eventService->findEvent($eventId);
+        if (!$event || $event->getUserId() != OW::getUser()->getId()) 
+        {
+            $respondArray['messageType'] = 'error';
+            $respondArray['message'] = '_ERROR_ 2';
+            echo json_encode($respondArray);
+            exit;
+        }
+
+        $eventUser = $this->eventService->findEventUser($eventId, $userId);
+        if (!$eventUser)
+        {
+            $eventUser = new EVENT_BOL_EventUser();
+            $eventUser->setUserId($userId);
+            $eventUser->setEventId($eventId);
+        }
+        $eventUser->setTimeStamp(time());
+        $eventUser->setStatus($status);
+        $this->eventService->saveEventUser($eventUser);
+
+        $respondArray['messageType'] = 'info';
+        $respondArray['message'] = OW::getLanguage()->text('event', 'response_updated');
 
         exit(json_encode($respondArray));
     }

@@ -1,0 +1,41 @@
+{style}
+{literal}
+.originalSelection {
+   border: 1px dashed black;
+}
+
+.currentSelection {
+   border: 3px solid black;
+}
+
+.centered {
+   text-align: center;
+}
+
+{/literal}
+{/style}
+{assign "alt" "1"}
+{block_decorator name='box' addClass="ow_std_margin clearfix"}
+
+   <table class="ow_table_1 ow_form ow_stdmargin">
+   {foreach from=$userResponseList item='userResponse' name='user_response_list'}
+  
+      <tr class="ow_alt{$alt}">
+          <td><img src="{$userResponse['avatar']}" /></td>
+          <td>{$userResponse['user']->getUsername()}</td>
+
+	  <td id="response_{$userResponse['user']->getId()}_1" class="{if "1" == $userResponse['status']}originalSelection currentSelection{/if} centered">{decorator name='button' class='ow_ic_ok' type='button' langLabel='event+manage_yes_btn_label' onclick=$userResponse['yes_click'] }</td>
+          <td id="response_{$userResponse['user']->getId()}_2" class="{if "2" == $userResponse['status']}originalSelection currentSelection{/if} centered">{decorator name='button' class='ow_ic_flag' type='button' langLabel='event+manage_maybe_btn_label' onclick=$userResponse['maybe_click'] }</td>
+          <td id="response_{$userResponse['user']->getId()}_3" class="{if "3" == $userResponse['status']}originalSelection currentSelection{/if} centered">{decorator name='button' class='ow_ic_warning' type='button' langLabel='event+manage_no_btn_label' onclick=$userResponse['no_click'] }</td>
+      </tr>
+
+      {if $alt == "1" }
+          {assign "alt" "2"}
+      {else}
+          {assign "alt" "1"}
+      {/if}
+
+   {/foreach}
+   </table>
+
+{/block_decorator}
