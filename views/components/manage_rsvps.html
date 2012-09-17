@@ -21,7 +21,7 @@
    {foreach from=$userResponseList item='userResponse' name='user_response_list'}
   
       <tr class="ow_alt{$alt}">
-          <td><img src="{$userResponse['avatar']}" /></td>
+          <td><img src="{$userResponse['avatar']}" width="45px" /></td>
           <td>{$userResponse['user']->getUsername()}</td>
 
 	  <td id="response_{$userResponse['user']->getId()}_1" class="{if "1" == $userResponse['status']}originalSelection currentSelection{/if} centered">{decorator name='button' class='ow_ic_ok' type='button' langLabel='event+manage_yes_btn_label' onclick=$userResponse['yes_click'] }</td>
