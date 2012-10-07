@@ -148,8 +148,8 @@ final class EVENT_BOL_EventService
 
         $pluginfilesDir = Ow::getPluginManager()->getPlugin('event')->getPluginFilesDir();
 
-        $tmpImgPath = $pluginfilesDir . 'img_' .uniqid() . '.jpg';
-        $tmpIconPath = $pluginfilesDir . 'icon_' . uniqid() . '.jpg';
+        $tmpImgPath = $pluginfilesDir . 'img_' .uniqid() . '.png';
+        $tmpIconPath = $pluginfilesDir . 'icon_' . uniqid() . '.png';
 
         $image = new UTIL_Image($imagePath);
         $image->resizeImage(295, null)->saveImage($tmpImgPath)
@@ -197,7 +197,7 @@ final class EVENT_BOL_EventService
     public function generateImagePath( $imageId, $icon = true )
     {
         $imagesDir = OW::getPluginManager()->getPlugin('event')->getUserFilesDir();
-        return $imagesDir . ( $icon ? 'event_icon_' : 'event_image_' ) . $imageId . '.jpg';
+        return $imagesDir . ( $icon ? 'event_icon_' : 'event_image_' ) . $imageId . '.png';
     }
 
     /**
