@@ -830,11 +830,29 @@ class EVENT_CTRL_Base extends OW_ActionController
 
         if ((int) $event->getUserId() === OW::getUser()->getId())
         {
+            $plugin = OW::getPluginManager()->getPlugin('event');
+            $params = array(
+                OW::getRouter()->urlFor('EVENT_CTRL_Base', 'mailRsvpsResponder'),
+                $event->getId(),
+            );
+
+            $this->assign('mailLink', true);
+            OW::getDocument()->addScript($plugin->getStaticJsUrl() . 'mail_rsvps.js');
+            OW::getDocument()->addOnloadScript("
+                var mailFloatBox;
+                $('#mailLink').click(
+                    function(){
+                        mailFloatBox = OW.ajaxFloatBox('EVENT_CMP_MailRsvps', " . json_encode($params) . ", {width:400, height:230, iconClass: 'ow_ic_user', title: '" . OW::getLanguage()->text('event', 'mail_button_label') . "'});
+                    }
+                );
+                OW.bind('event.mail_sent', function() { mailFloatBox.close(); });
+            ");
+
             $params = array(
                 $event->getId()
             );
-
             $this->assign('manageLink', true);
+            // OW::getDocument()->addScript($plugin->getStaticJsUrl() . 'manage_rsvps.js');
             OW::getDocument()->addOnloadScript("
                 var manageFloatBox;
                 $('#manageLink').click(
@@ -853,7 +871,7 @@ class EVENT_CTRL_Base extends OW_ActionController
                     $.ajax({
                         type: 'POST',
                         url: " . json_encode(OW::getRouter()->urlFor('EVENT_CTRL_Base', 'manageInviteResponder')) . ",
-                        data: 'eventId=" . json_encode($event->getId()) . "&userId=' + \$userId + '&status=' + \$toStatus,
+                        data: 'eventId=' + \$eventId + '&userId=' + \$userId + '&status=' + \$toStatus,
                         dataType: 'json',
                         success : function(data){
                             if( data.messageType == 'error' )
@@ -1367,6 +1385,68 @@ class EVENT_CTRL_Base extends OW_ActionController
         return $event->getOpenTimeStamp() > time() || $event->getClosedTimeStamp() < time();
     }
 
+    public function mailRsvpsResponder() 
+    {
+        if ( !OW::getRequest()->isAjax() || !OW::getUser()->isAuthenticated() )
+        {
+            throw new Redirect404Exception();
+        }
+
+        $eventId = $_POST['eventId'];
+        $event = $this->eventService->findEvent($eventId);
+
+        $recipients = array();
+       
+        if (!empty($_POST['yes'])) 
+        {
+            $recipients = array_merge( $recipients, $this->eventService->findEventUsers($eventId, EVENT_BOL_EventService::USER_STATUS_YES, 1));
+        }
+
+        if (!empty($_POST['no'])) 
+        {
+            $recipients = array_merge( $recipients, $this->eventService->findEventUsers($eventId, EVENT_BOL_EventService::USER_STATUS_NO, 1));
+        }
+
+        if (!empty($_POST['maybe']))
+        {
+            $recipients = array_merge( $recipients, $this->eventService->findEventUsers($eventId, EVENT_BOL_EventService::USER_STATUS_MAYBE, 1));
+        }
+
+        if (count($recipients) == 0) 
+        {
+            $respondArray['messageType'] = 'error';
+            $respondArray['message'] = OW::getLanguage()->text('event', 'mail_no_recipients');
+            exit(json_encode($respondArray));
+        }
+        $mailParams = array(
+            'url' => OW::getRouter()->urlForRoute('event.view', array('eventId' => $eventId)),
+            'from' => OW::getUser()->getUserObject()->getUsername(),
+            'html_message' => preg_replace('/\n/', '<br/>', $_POST['message']),
+            'text_message' => $_POST['message']
+        );
+        $language = OW::getLanguage();
+
+        $mail = OW::getMailer()->createMail();
+        foreach ($recipients as $eventUser) {
+           $user = BOL_UserService::getInstance()->findUserById($eventUser->getUserId());
+           $mail->addRecipientEmail($user->getEmail());
+        }
+        $mail->setSubject($language->text('event', 'mail_template_message_subject', array( 'event' => $event->getTitle())));
+        $mail->setTextContent($language->text('event', 'mail_template_message_content_text', $mailParams));
+        $mail->setHtmlContent($language->text('event', 'mail_template_message_content_html', $mailParams));
+        OW::getMailer()->addToQueue($mail);
+
+        if (!empty($_POST['comment']))
+        {
+           // TODO post as comment as well 
+        }
+
+        $respondArray['messageType'] = 'info';
+        $respondArray['message'] = OW::getLanguage()->text('event', 'mail_sent');
+
+        exit(json_encode($respondArray));
+    }
+
     /**
      * Responder for event attend form
      */
@@ -1502,6 +1582,11 @@ class EVENT_CTRL_Base extends OW_ActionController
     }
 
     public function manageInviteResponder() {
+        if ( !OW::getRequest()->isAjax() || !OW::getUser()->isAuthenticated() )
+        {
+            throw new Redirect404Exception();
+        }
+
         $eventId = $_POST['eventId'];
         $userId = $_POST['userId'];
         $status = $_POST['status'];

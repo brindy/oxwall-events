@@ -1,0 +1,30 @@
+{style}
+{literal}
+.centered {
+   text-align: center;
+}
+{/literal}
+{/style}
+
+<div id="mail_container" class="centered ow_alt1">
+    <div>
+    <textarea id="mail_body"></textarea>
+    </div>
+
+    <div style="text-align: left; padding-top: 10px">
+      <div><input type="checkbox" id="mail_yes" checked="checked" />{text key="event+mail_yes_users"}</div>
+      <div><input type="checkbox" id="mail_maybe" />{text key="event+mail_no_users"}</div>
+      <div><input type="checkbox" id="mail_no" />{text key="event+mail_maybe_users"}</div>
+      <div><input type="checkbox" id="mail_as_comment" checked="checked" />{text key="event+mail_add_comment"}</div>
+    </div>
+    
+    <div style="text-align: right; padding-top: 10px">
+      {decorator name='button' class='ow_ic_ok' type='button' langLabel='event+mail_send_btn_label' onclick=$trigger }
+    </div>
+</div>
+
+<div id="mail_waiting" style="display: hidden">
+
+   {text key="event+mail_please_wait"}
+
+</div>
